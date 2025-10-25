@@ -614,6 +614,15 @@ const ConfirmationPage = () => {
 // --- APP ---
 const App = () => {
     const path = usePath();
+
+    // Handle Google site verification file route
+    if (path === '/googlef1dff6d4da7988a6.html') {
+        // We render the verification string directly. This is a workaround
+        // for issues where static file serving might fail. Google's crawler
+        // will find this string in the page body.
+        return <>google-site-verification: googlef1dff6d4da7988a6.html</>;
+    }
+    
     const parts = path.split('/').filter(Boolean);
 
     const renderPage = () => {
