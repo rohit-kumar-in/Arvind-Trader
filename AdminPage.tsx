@@ -156,15 +156,31 @@ export const AdminPage = ({ products, setProducts, setHeroImageUrl }: {
   };
 
   const handleSave = (productToSave: Product) => {
-    if (productToSave.id) {
-        setProducts(prev => prev.map(p => p.id === productToSave.id ? productToSave : p));
+    // Create a mutable copy to ensure we can modify it.
+    const updatedProduct = { ...productToSave };
+
+    // If the product has variants, we need to ensure their images are
+    // synchronized with the main product image that was just uploaded.
+    // The product detail page prioritizes variant images, so if they
+    // aren't updated, the new main image won't show.
+    if (updatedProduct.variants && updatedProduct.variants.length > 0) {
+      updatedProduct.variants = updatedProduct.variants.map(variant => ({
+        ...variant,
+        imageUrl: updatedProduct.imageUrl, // Set variant image to the main product image
+      }));
+    }
+
+    if (updatedProduct.id) {
+        // This is an existing product, so we update it in the list.
+        setProducts(prev => prev.map(p => (p.id === updatedProduct.id ? updatedProduct : p)));
     } else {
+        // This is a new product.
         const placeholderImage = 'https://i.imgur.com/dynTM3k.png'; // Generic placeholder
         const newProduct = { 
-            ...productToSave, 
+            ...updatedProduct, 
             id: Date.now(),
-            // Ensure new products without an uploaded image get a placeholder
-            imageUrl: productToSave.imageUrl || placeholderImage 
+            // Ensure new products without an uploaded image get a placeholder.
+            imageUrl: updatedProduct.imageUrl || placeholderImage 
         };
         setProducts(prev => [...prev, newProduct]);
     }
