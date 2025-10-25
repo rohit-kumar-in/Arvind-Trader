@@ -104,7 +104,6 @@ export const useCart = () => {
 // --- ROUTING ---
 const navigate = (href: string) => {
     window.history.pushState({}, '', href);
-    // Dispatch a popstate event to make the router update
     const navEvent = new PopStateEvent('popstate');
     window.dispatchEvent(navEvent);
 };
@@ -130,13 +129,51 @@ const Link = ({ href, children, className }: { href: string, children: React.Rea
 };
 
 
-// --- HELPERS ---
-const updateMeta = (title: string, description: string) => {
+// --- SEO HELPERS ---
+const updateSeoTags = (title: string, description: string, imageUrl?: string) => {
   document.title = title;
-  const metaDescription = document.querySelector('meta[name="description"]');
-  if (metaDescription) {
-    metaDescription.setAttribute('content', description);
+
+  const setMeta = (name: string, property: string, content: string) => {
+    let element = document.querySelector(`meta[${name}="${property}"]`) as HTMLMetaElement;
+    if (!element) {
+        element = document.createElement('meta');
+        element.setAttribute(name, property);
+        document.head.appendChild(element);
+    }
+    element.setAttribute('content', content);
+  };
+
+  setMeta('name', 'description', description);
+  setMeta('property', 'og:title', title);
+  setMeta('property', 'og:description', description);
+  setMeta('property', 'og:url', window.location.href);
+  if (imageUrl) {
+    setMeta('property', 'og:image', imageUrl);
   }
+};
+
+const JsonLd = ({ data }: { data: object }) => {
+  useEffect(() => {
+    const scriptId = 'json-ld-script';
+    let script = document.getElementById(scriptId) as HTMLScriptElement;
+    if (!script) {
+      script = document.createElement('script');
+      script.type = 'application/ld+json';
+      script.id = scriptId;
+      document.head.appendChild(script);
+    }
+    script.text = JSON.stringify(data);
+
+    return () => {
+      // Clean up script on component unmount
+      const scriptToRemove = document.getElementById(scriptId);
+      if (scriptToRemove) {
+        scriptToRemove.remove();
+      }
+    };
+  }, [data]);
+
+  return null;
 };
 
 
@@ -190,10 +227,25 @@ const ProductCard = ({ product }: { product: Product }) => {
 
 const HomePage = () => {
     useEffect(() => {
-        updateMeta('Arvind Trader | High-Quality Electronics', 'Your one-stop shop for the latest and greatest in tech. High-quality electronics, from headphones to smartwatches.');
+        updateSeoTags('Arvind Trader | High-Quality Electronics', 'Your one-stop shop for the latest and greatest in tech. High-quality electronics, from headphones to smartwatches.');
     }, []);
+    
+    const organizationSchema = {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Arvind Trader",
+      "url": "https://arvind-trader.vercel.app/",
+      "logo": "https://arvind-trader.vercel.app/logo.png", // Assume you have a logo
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "telephone": "+1-800-555-0199",
+        "contactType": "customer service"
+      }
+    };
+
     return (
         <div className="container">
+            <JsonLd data={organizationSchema} />
             <div className="hero">
                 <h1>Welcome to Arvind Trader</h1>
                 <p>Your one-stop shop for the latest and greatest in tech.</p>
@@ -209,7 +261,7 @@ const HomePage = () => {
 
 const ProductListPage = () => {
     useEffect(() => {
-        updateMeta('All Products | Arvind Trader', 'Browse our full collection of high-quality electronic gadgets and accessories.');
+        updateSeoTags('All Products | Arvind Trader', 'Browse our full collection of high-quality electronic gadgets and accessories.');
     }, []);
     return (
         <div className="container">
@@ -227,9 +279,9 @@ const ProductDetailPage = ({ id }: { id: number }) => {
 
     useEffect(() => {
         if (product) {
-            updateMeta(`${product.name} | Arvind Trader`, product.description);
+            updateSeoTags(`${product.name} | Arvind Trader`, product.description, product.imageUrl);
         } else {
-            updateMeta('Product Not Found | Arvind Trader', 'The product you are looking for does not exist.');
+            updateSeoTags('Product Not Found | Arvind Trader', 'The product you are looking for does not exist.');
         }
     }, [product]);
 
@@ -237,8 +289,32 @@ const ProductDetailPage = ({ id }: { id: number }) => {
         return <div className="container"><h2>Product not found!</h2></div>;
     }
 
+    const productSchema = {
+        "@context": "https://schema.org/",
+        "@type": "Product",
+        "name": product.name,
+        "image": [product.imageUrl],
+        "description": product.description,
+        "sku": `AT-${product.id}`,
+        "mpn": `AT-MPN-${product.id}`,
+        "brand": {
+          "@type": "Brand",
+          "name": "Arvind Trader"
+        },
+        "offers": {
+          "@type": "Offer",
+          "url": window.location.href,
+          "priceCurrency": "USD",
+          "price": product.price.toFixed(2),
+          "priceValidUntil": "2024-12-31",
+          "itemCondition": "https://schema.org/NewCondition",
+          "availability": "https://schema.org/InStock"
+        }
+    };
+
     return (
         <div className="container">
+            <JsonLd data={productSchema} />
             <div className="product-detail-container">
                 <div className="product-detail-image">
                     <img src={product.imageUrl} alt={product.name} />
@@ -258,7 +334,7 @@ const CartPage = () => {
     const { cartItems, updateQuantity, removeFromCart, getCartTotal } = useCart();
     
     useEffect(() => {
-        updateMeta('Your Shopping Cart | Arvind Trader', 'Review, update, or remove items from your shopping cart before proceeding to checkout.');
+        updateSeoTags('Your Shopping Cart | Arvind Trader', 'Review, update, or remove items from your shopping cart before proceeding to checkout.');
     }, []);
 
     if (cartItems.length === 0) {
@@ -303,7 +379,7 @@ const CheckoutPage = () => {
     const { getCartTotal, clearCart } = useCart();
     
     useEffect(() => {
-        updateMeta('Checkout | Arvind Trader', 'Complete your purchase by providing your shipping and payment information.');
+        updateSeoTags('Checkout | Arvind Trader', 'Complete your purchase by providing your shipping and payment information.');
     }, []);
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -339,7 +415,7 @@ const CheckoutPage = () => {
 
 const ConfirmationPage = () => {
     useEffect(() => {
-        updateMeta('Order Confirmed! | Arvind Trader', 'Thank you for your purchase from Arvind Trader.');
+        updateSeoTags('Order Confirmed! | Arvind Trader', 'Thank you for your purchase from Arvind Trader.');
     }, []);
     return (
         <div className="container confirmation-page">
@@ -381,18 +457,18 @@ const App = () => {
     );
 };
 
-// This handles the initial load for path-based routing on a static server
-// It ensures that if a user directly navigates to /products, it renders correctly.
+
 const container = document.getElementById('root');
 if (container) {
-  // All clicks on <a> tags are intercepted to use client-side routing.
+  // Global click handler for client-side routing
   document.addEventListener('click', (e) => {
     const anchor = (e.target as HTMLElement).closest('a');
-    if (anchor && anchor.href && anchor.target !== '_blank') {
-      const url = new URL(anchor.href);
-      if (url.origin === window.location.origin) {
-        e.preventDefault();
-        navigate(url.pathname);
+    if (anchor && anchor.target !== '_blank' && anchor.href.startsWith(window.location.origin)) {
+      e.preventDefault();
+      const currentPath = window.location.pathname;
+      const newPath = new URL(anchor.href).pathname;
+      if(currentPath !== newPath) {
+        navigate(newPath);
       }
     }
   });
