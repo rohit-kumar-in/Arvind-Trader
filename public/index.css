@@ -174,7 +174,7 @@ img {
 
 /* Home Page */
 .hero {
-    background: linear-gradient(rgba(10, 37, 64, 0.7), rgba(10, 37, 64, 0.7)), url('https://i.imgur.com/pYm20G9.jpg');
+    background: linear-gradient(rgba(10, 37, 64, 0.6), rgba(10, 37, 64, 0.6)), url('https://i.imgur.com/8FNM9h3.jpeg');
     background-size: cover;
     background-position: center;
     color: var(--text-light);
