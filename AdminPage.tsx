@@ -1,5 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Product } from './index.tsx';
+
+const PRODUCTS_PER_PAGE = 5;
+
+// --- HELPERS ---
+const getProductMinPrice = (product: Product): number => {
+    if (product.variants && product.variants.length > 0) {
+        return Math.min(...product.variants.map(v => v.price));
+    }
+    return product.price || 0;
+};
+
 
 // --- SUB-COMPONENT: PRODUCT FORM ---
 const ProductForm = ({
@@ -31,6 +42,10 @@ const ProductForm = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!formData.category) {
+        alert('Please enter a category for the product.');
+        return;
+    }
     onSave(formData as Product);
   };
 
@@ -40,19 +55,23 @@ const ProductForm = ({
       <form onSubmit={handleSubmit} className="admin-form">
         <div className="form-group">
           <label htmlFor="name">Product Name</label>
-          <input type="text" name="name" value={formData.name || ''} onChange={handleChange} required />
+          <input type="text" id="name" name="name" value={formData.name || ''} onChange={handleChange} required />
+        </div>
+        <div className="form-group">
+          <label htmlFor="category">Category</label>
+          <input type="text" id="category" name="category" value={formData.category || ''} onChange={handleChange} required />
         </div>
         <div className="form-group">
           <label htmlFor="description">Description</label>
-          <textarea name="description" value={formData.description || ''} onChange={handleChange} rows={4} required />
+          <textarea id="description" name="description" value={formData.description || ''} onChange={handleChange} rows={4} required />
         </div>
         <div className="form-group">
           <label htmlFor="price">Price (for simple products)</label>
-          <input type="number" name="price" value={formData.price || ''} onChange={handleChange} step="0.01" />
+          <input type="number" id="price" name="price" value={formData.price || ''} onChange={handleChange} step="0.01" />
         </div>
         <div className="form-group">
           <label htmlFor="imageUrl">Image</label>
-          <input type="file" name="image" accept="image/*" onChange={handleImageUpload} />
+          <input type="file" id="imageUrl" name="image" accept="image/*" onChange={handleImageUpload} />
           {formData.imageUrl && <img src={formData.imageUrl} alt="Preview" className="image-preview" />}
         </div>
         <div className="form-actions">
@@ -72,7 +91,13 @@ export const AdminPage = ({ products, setProducts, setHeroImageUrl }: {
 }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Partial<Product> | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [sortOrder, setSortOrder] = useState('default');
+  const [currentPage, setCurrentPage] = useState(1);
+  
   const defaultHeroImage = 'https://i.imgur.com/5z02k5c.jpeg';
+  const categories = useMemo(() => ['all', ...Array.from(new Set(products.map(p => p.category)))], [products]);
 
 
   useEffect(() => {
@@ -82,6 +107,40 @@ export const AdminPage = ({ products, setProducts, setHeroImageUrl }: {
     }
   }, []);
   
+  const filteredAndSortedProducts = useMemo(() => {
+    let processedProducts = products
+      .filter(p => p.name.toLowerCase().includes(searchTerm.toLowerCase()))
+      .filter(p => categoryFilter === 'all' || p.category === categoryFilter);
+    
+    switch (sortOrder) {
+        case 'az':
+            processedProducts.sort((a, b) => a.name.localeCompare(b.name));
+            break;
+        case 'za':
+            processedProducts.sort((a, b) => b.name.localeCompare(a.name));
+            break;
+        case 'price-lh':
+            processedProducts.sort((a, b) => getProductMinPrice(a) - getProductMinPrice(b));
+            break;
+        case 'price-hl':
+            processedProducts.sort((a, b) => getProductMinPrice(b) - getProductMinPrice(a));
+            break;
+    }
+    
+    return processedProducts;
+  }, [products, searchTerm, categoryFilter, sortOrder]);
+  
+  const totalPages = Math.ceil(filteredAndSortedProducts.length / PRODUCTS_PER_PAGE);
+  const currentProducts = filteredAndSortedProducts.slice(
+    (currentPage - 1) * PRODUCTS_PER_PAGE,
+    currentPage * PRODUCTS_PER_PAGE
+  );
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, sortOrder, categoryFilter]);
+
+
   const handleEdit = (product: Product) => {
     setEditingProduct(product);
   };
@@ -98,14 +157,12 @@ export const AdminPage = ({ products, setProducts, setHeroImageUrl }: {
 
   const handleSave = (productToSave: Product) => {
     if (productToSave.id) {
-        // Update existing product
         setProducts(prev => prev.map(p => p.id === productToSave.id ? productToSave : p));
     } else {
-        // Add new product
-        const newProduct = { ...productToSave, id: Date.now() }; // Simple unique ID
+        const newProduct = { ...productToSave, id: Date.now() };
         setProducts(prev => [...prev, newProduct]);
     }
-    setEditingProduct(null); // Close form
+    setEditingProduct(null);
   };
   
   const handleBannerUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -143,20 +200,55 @@ export const AdminPage = ({ products, setProducts, setHeroImageUrl }: {
     <div className="container admin-container">
       <h1>Admin Panel</h1>
       <div className="admin-section">
-          <h2>Manage Products</h2>
-          <button className="btn" onClick={handleAddNew} style={{marginBottom: '1rem'}}>Add New Product</button>
+          <div className="admin-header">
+              <h2>Manage Products ({filteredAndSortedProducts.length})</h2>
+              <button className="btn" onClick={handleAddNew}>Add New Product</button>
+          </div>
+          
+          <div className="admin-controls">
+            <input 
+                type="text" 
+                placeholder="Search products..." 
+                className="admin-search-input" 
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
+            />
+            <select className="admin-control-select" value={categoryFilter} onChange={e => setCategoryFilter(e.target.value)}>
+                {categories.map(cat => <option key={cat} value={cat}>{cat === 'all' ? 'All Categories' : cat}</option>)}
+            </select>
+            <select className="admin-control-select" value={sortOrder} onChange={e => setSortOrder(e.target.value)}>
+                <option value="default">Sort by Default</option>
+                <option value="az">Sort by Name (A-Z)</option>
+                <option value="za">Sort by Name (Z-A)</option>
+                <option value="price-lh">Sort by Price (Low to High)</option>
+                <option value="price-hl">Sort by Price (High to Low)</option>
+            </select>
+          </div>
+
           <div className="admin-product-list">
-            {products.map(product => (
+            {currentProducts.map(product => (
               <div key={product.id} className="admin-product-item">
                 <img src={product.imageUrl} alt={product.name} />
-                <span>{product.name}</span>
+                <div className="admin-product-details">
+                    <span className="admin-product-name">{product.name}</span>
+                    <span className="admin-product-category">{product.category}</span>
+                </div>
                 <div className="admin-product-actions">
                     <button className="btn btn-secondary" onClick={() => handleEdit(product)}>Edit</button>
                     <button className="btn btn-danger" onClick={() => handleDelete(product.id)}>Delete</button>
                 </div>
               </div>
             ))}
+             {filteredAndSortedProducts.length === 0 && <p>No products found.</p>}
           </div>
+
+          {totalPages > 1 && (
+            <div className="pagination-controls">
+                <button className="btn" onClick={() => setCurrentPage(p => p - 1)} disabled={currentPage === 1}>Previous</button>
+                <span>Page {currentPage} of {totalPages}</span>
+                <button className="btn" onClick={() => setCurrentPage(p => p + 1)} disabled={currentPage === totalPages}>Next</button>
+            </div>
+          )}
       </div>
       <div className="admin-section">
         <h2>Homepage Banner</h2>
