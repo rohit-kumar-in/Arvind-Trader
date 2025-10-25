@@ -12,7 +12,7 @@ export const AboutPage = () => {
 
     return (
         <div className="container">
-            <div className="about-container">
+            <div className="about-container" lang="hi">
                 <h1>🛍️ अरविंद ट्रेडर</h1>
                 
                 <h2>🏪 हमारे बारे में</h2>

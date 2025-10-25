@@ -8,23 +8,36 @@ import { AboutPage } from './AboutPage.tsx';
 
 // --- DATA & TYPES ---
 
+interface Variant {
+  id: number;
+  size: string;
+  color: string;
+  price: number;
+  sku: string;
+}
+
 interface Product {
   id: number;
   name: string;
-  price: number;
   description: string;
   imageUrl: string;
+  variants?: Variant[];
+  price?: number; // For simple products without variants
 }
 
-interface CartItem extends Product {
-  quantity: number;
+
+interface CartItem {
+    product: Product;
+    variant: Variant;
+    quantity: number;
 }
+
 
 interface CartContextType {
   cartItems: CartItem[];
-  addToCart: (product: Product, quantity?: number) => void;
-  updateQuantity: (productId: number, newQuantity: number) => void;
-  removeFromCart: (productId: number) => void;
+  addToCart: (product: Product, variant: Variant, quantity?: number) => void;
+  updateQuantity: (cartItemId: string, newQuantity: number) => void;
+  removeFromCart: (cartItemId: string) => void;
   getCartTotal: () => number;
   getCartItemCount: () => number;
   clearCart: () => void;
@@ -32,16 +45,31 @@ interface CartContextType {
 
 
 const products: Product[] = [
-  { id: 1, name: 'Standard PP Carry Bag (10x14)', price: 0.15, description: 'Durable and lightweight PP (polypropylene) bags, perfect for retail stores and groceries. Standard 10x14 inch size.', imageUrl: 'https://images.unsplash.com/photo-1591543620767-54912b2a5a8a?q=80&w=2070&auto=format&fit=crop' },
-  { id: 2, name: 'Printed Non-Woven D-Cut Bag', price: 0.25, description: 'Eco-friendly non-woven fabric bags with a D-cut handle. Ideal for promotional events and boutiques. Custom printing available on bulk orders.', imageUrl: 'https://images.unsplash.com/photo-1623485790323-95f70a255956?q=80&w=1935&auto=format&fit=crop' },
-  { id: 3, name: 'Heavy Duty Grocery Bag (W-Cut)', price: 0.20, description: 'Strong, reusable W-cut (vest style) bags designed to carry heavy grocery items without tearing. A reliable choice for supermarkets.', imageUrl: 'https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=1974&auto=format&fit=crop' },
-  { id: 4, name: 'Custom Logo Fabric Tote Bag', price: 2.50, description: 'High-quality cotton fabric tote bags. Perfect for branding with your company logo. Stylish, washable, and reusable.', imageUrl: 'https://images.unsplash.com/photo-1544441893-675973e31985?q=80&w=2070&auto=format&fit=crop' },
-  { id: 5, name: 'Transparent Garment Bags', price: 0.50, description: 'Clear polythene bags to protect clothing from dust and moisture. Ideal for dry cleaners, laundromats, and boutiques.', imageUrl: 'https://images.unsplash.com/photo-1555529771-835f59fc5efe?q=80&w=1974&auto=format&fit=crop' },
-  { id: 6, name: 'Eco-Friendly Jute Shopping Bag', price: 3.00, description: 'A stylish and sustainable option. These sturdy jute bags are perfect for eco-conscious brands and customers.', imageUrl: 'https://images.unsplash.com/photo-1621495474723-38c642e05f6a?q=80&w=1964&auto=format&fit=crop' },
-  { id: 7, name: 'Brown Kraft Paper Bag with Handle', price: 0.40, description: 'Classic and recyclable brown paper bags with strong twisted paper handles. A great choice for restaurants, cafes, and retail shops.', imageUrl: 'https://images.unsplash.com/photo-1526310242159-7b33989fb51e?q=80&w=1974&auto=format&fit=crop' },
-  { id: 8, name: 'Tamper-Proof Courier Bags (100 Pack)', price: 15.00, description: 'Secure, self-sealing courier bags for e-commerce shipping. Tear-resistant and waterproof to protect contents.', imageUrl: 'https://images.unsplash.com/photo-1594894334346-a60205935b5b?q=80&w=2070&auto=format&fit=crop' },
-  { id: 9, name: 'Small Polythene Pouch Bags (5x7)', price: 0.05, description: 'Versatile small clear pouches for packing spices, hardware, or other small items. Available in various sizes.', imageUrl: 'https://images.unsplash.com/photo-1606554862580-0a544c4a4533?q=80&w=2070&auto=format&fit=crop' },
-  { id: 10, name: 'Large Industrial Packaging Bag', price: 1.20, description: 'Extra-large and durable woven polypropylene sack for bulk storage and transport of grains, sand, or construction materials.', imageUrl: 'https://images.unsplash.com/photo-1618218932159-dd404748115b?q=80&w=2070&auto=format&fit=crop' },
+  { 
+    id: 1, 
+    name: 'Standard PP Carry Bag', 
+    description: 'Durable and lightweight PP (polypropylene) bags, perfect for retail stores and groceries. Available in multiple sizes and colors.', 
+    imageUrl: 'https://i.imgur.com/8L5s2aN.jpeg',
+    variants: [
+        { id: 101, size: '500g', color: 'White', price: 150, sku: 'PP-500-W' },
+        { id: 102, size: '500g', color: 'Black', price: 160, sku: 'PP-500-B' },
+        { id: 103, size: '1kg', color: 'White', price: 250, sku: 'PP-1KG-W' },
+        { id: 104, size: '1kg', color: 'Black', price: 265, sku: 'PP-1KG-B' },
+        { id: 105, size: '2kg', color: 'White', price: 400, sku: 'PP-2KG-W' },
+        { id: 106, size: '2kg', color: 'Black', price: 420, sku: 'PP-2KG-B' },
+        { id: 107, size: '5kg', color: 'White', price: 600, sku: 'PP-5KG-W' },
+        { id: 108, size: '5kg', color: 'Black', price: 630, sku: 'PP-5KG-B' },
+    ]
+  },
+  { id: 2, name: 'Printed Non-Woven D-Cut Bag', price: 300, description: 'Eco-friendly non-woven fabric bags with a D-cut handle. Ideal for promotional events and boutiques. Price per 100 pieces. Custom printing available on bulk orders.', imageUrl: 'https://images.unsplash.com/photo-1623485790323-95f70a255956?q=80&w=1935&auto=format&fit=crop' },
+  { id: 3, name: 'Heavy Duty Grocery Bag (W-Cut)', price: 250, description: 'Strong, reusable W-cut (vest style) bags designed to carry heavy grocery items without tearing. Price per 100 pieces. A reliable choice for supermarkets.', imageUrl: 'https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=1974&auto=format&fit=crop' },
+  { id: 4, name: 'Custom Logo Fabric Tote Bag', price: 120, description: 'High-quality cotton fabric tote bags. Perfect for branding with your company logo. Stylish, washable, and reusable. Price per piece.', imageUrl: 'https://images.unsplash.com/photo-1544441893-675973e31985?q=80&w=2070&auto=format&fit=crop' },
+  { id: 5, name: 'Transparent Garment Bags', price: 500, description: 'Clear polythene bags to protect clothing from dust and moisture. Price per roll. Ideal for dry cleaners, laundromats, and boutiques.', imageUrl: 'https://images.unsplash.com/photo-1555529771-835f59fc5efe?q=80&w=1974&auto=format&fit=crop' },
+  { id: 6, name: 'Eco-Friendly Jute Shopping Bag', price: 150, description: 'A stylish and sustainable option. These sturdy jute bags are perfect for eco-conscious brands and customers. Price per piece.', imageUrl: 'https://images.unsplash.com/photo-1621495474723-38c642e05f6a?q=80&w=1964&auto=format&fit=crop' },
+  { id: 7, name: 'Brown Kraft Paper Bag with Handle', price: 450, description: 'Classic and recyclable brown paper bags with strong twisted paper handles. Price per 100 pieces. A great choice for restaurants and retail.', imageUrl: 'https://images.unsplash.com/photo-1526310242159-7b33989fb51e?q=80&w=1974&auto=format&fit=crop' },
+  { id: 8, name: 'Tamper-Proof Courier Bags (100 Pack)', price: 400, description: 'Secure, self-sealing courier bags for e-commerce shipping. Tear-resistant and waterproof to protect contents.', imageUrl: 'https://images.unsplash.com/photo-1594894334346-a60205935b5b?q=80&w=2070&auto=format&fit=crop' },
+  { id: 9, name: 'Small Polythene Pouch Bags (5x7)', price: 100, description: 'Versatile small clear pouches for packing spices, hardware, or other small items. Price per pack of 100.', imageUrl: 'https://images.unsplash.com/photo-1606554862580-0a544c4a4533?q=80&w=2070&auto=format&fit=crop' },
+  { id: 10, name: 'Large Industrial Packaging Bag', price: 60, description: 'Extra-large and durable woven polypropylene sack for bulk storage and transport of grains, sand, or construction materials. Price per piece.', imageUrl: 'https://images.unsplash.com/photo-1618218932159-dd404748115b?q=80&w=2070&auto=format&fit=crop' },
 ];
 
 
@@ -51,32 +79,32 @@ const CartContext = createContext<CartContextType | null>(null);
 export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
 
-  const addToCart = (product: Product, quantity = 1) => {
+  const addToCart = (product: Product, variant: Variant, quantity = 1) => {
     setCartItems(prevItems => {
-      const existingItem = prevItems.find(item => item.id === product.id);
+      const existingItem = prevItems.find(item => item.product.id === product.id && item.variant.id === variant.id);
       if (existingItem) {
         return prevItems.map(item =>
-          item.id === product.id ? { ...item, quantity: item.quantity + quantity } : item
+          (item.product.id === product.id && item.variant.id === variant.id) ? { ...item, quantity: item.quantity + quantity } : item
         );
       }
-      return [...prevItems, { ...product, quantity }];
+      return [...prevItems, { product, variant, quantity }];
     });
   };
 
-  const updateQuantity = (productId: number, newQuantity: number) => {
+  const updateQuantity = (cartItemId: string, newQuantity: number) => {
     if (newQuantity <= 0) {
-      removeFromCart(productId);
+      removeFromCart(cartItemId);
     } else {
       setCartItems(prevItems =>
         prevItems.map(item =>
-          item.id === productId ? { ...item, quantity: newQuantity } : item
+          `${item.product.id}-${item.variant.id}` === cartItemId ? { ...item, quantity: newQuantity } : item
         )
       );
     }
   };
   
-  const removeFromCart = (productId: number) => {
-    setCartItems(prevItems => prevItems.filter(item => item.id !== productId));
+  const removeFromCart = (cartItemId: string) => {
+    setCartItems(prevItems => prevItems.filter(item => `${item.product.id}-${item.variant.id}` !== cartItemId));
   };
   
   const clearCart = () => {
@@ -84,7 +112,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const getCartTotal = () => {
-    return cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
+    return cartItems.reduce((total, item) => total + item.variant.price * item.quantity, 0);
   };
   
   const getCartItemCount = () => {
@@ -136,8 +164,19 @@ const Link = ({ href, children, className }: { href: string, children: React.Rea
 
 
 // --- SEO HELPERS ---
+const updateCanonicalUrl = (url: string) => {
+    let canonicalLink = document.querySelector('link[rel="canonical"]') as HTMLLinkElement;
+    if (!canonicalLink) {
+        canonicalLink = document.createElement('link');
+        canonicalLink.setAttribute('rel', 'canonical');
+        document.head.appendChild(canonicalLink);
+    }
+    canonicalLink.setAttribute('href', url);
+};
+
 export const updateSeoTags = (title: string, description: string, imageUrl?: string) => {
   document.title = title;
+  updateCanonicalUrl(window.location.href);
 
   const setMeta = (name: string, property: string, content: string) => {
     let element = document.querySelector(`meta[${name}="${property}"]`) as HTMLMetaElement;
@@ -171,7 +210,6 @@ const JsonLd = ({ data }: { data: object }) => {
     script.text = JSON.stringify(data);
 
     return () => {
-      // Clean up script on component unmount
       const scriptToRemove = document.getElementById(scriptId);
       if (scriptToRemove) {
         scriptToRemove.remove();
@@ -213,7 +251,14 @@ const Footer = () => (
 );
 
 const ProductCard = ({ product }: { product: Product }) => {
-    const { addToCart } = useCart();
+    const getPriceDisplay = () => {
+        if (product.variants && product.variants.length > 0) {
+            const minPrice = Math.min(...product.variants.map(v => v.price));
+            return `From ₹${minPrice.toFixed(2)}`;
+        }
+        return `₹${product.price?.toFixed(2)}`;
+    };
+
     return (
         <div className="product-card">
             <Link href={`/product/${product.id}`}>
@@ -223,8 +268,10 @@ const ProductCard = ({ product }: { product: Product }) => {
                 </div>
             </Link>
              <div className="product-info">
-                <p className="product-price">${product.price.toFixed(2)}</p>
-                <button onClick={() => addToCart(product)} className="btn">Add to Cart</button>
+                <p className="product-price">{getPriceDisplay()}</p>
+                <Link href={`/product/${product.id}`} className="btn">
+                    {product.variants ? 'Select Options' : 'View Product'}
+                </Link>
             </div>
         </div>
     );
@@ -274,6 +321,9 @@ const ProductListPage = () => {
     return (
         <div className="container">
             <h1>All Products</h1>
+            <div className="discount-callout">
+                For bulk orders and discounts, please <a href="tel:7644000929">call us at 7644000929</a>.
+            </div>
             <div className="product-grid">
                 {products.map(product => <ProductCard key={product.id} product={product} />)}
             </div>
@@ -284,6 +334,8 @@ const ProductListPage = () => {
 const ProductDetailPage = ({ id }: { id: number }) => {
     const { addToCart } = useCart();
     const product = products.find(p => p.id === id);
+
+    const [selectedVariant, setSelectedVariant] = useState<Variant | null>(product?.variants ? product.variants[0] : null);
 
     useEffect(() => {
         if (product) {
@@ -297,47 +349,103 @@ const ProductDetailPage = ({ id }: { id: number }) => {
         return <div className="container"><h2>Product not found!</h2></div>;
     }
 
+    const handleAddToCart = () => {
+        if (product.variants && selectedVariant) {
+            addToCart(product, selectedVariant, 1);
+        } else if (product.price) {
+            // Fallback for simple products
+            const simpleVariant: Variant = { id: product.id, price: product.price, sku: `AT-CB-${product.id}`, size: 'Standard', color: 'N/A' };
+            addToCart(product, simpleVariant, 1);
+        }
+    };
+    
+    const handleVariantChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const variantId = parseInt(e.target.value, 10);
+        const newVariant = product.variants?.find(v => v.id === variantId) || null;
+        setSelectedVariant(newVariant);
+    };
+
     const relatedProducts = products
         .filter(p => p.id !== product.id)
         .sort(() => 0.5 - Math.random())
         .slice(0, 3);
+        
+    const getProductSchema = () => {
+        const baseSchema = {
+            "@context": "https://schema.org/",
+            "@type": "Product",
+            "name": product.name,
+            "image": [product.imageUrl],
+            "description": product.description,
+            "category": "Packaging & Bags",
+            "brand": { "@type": "Brand", "name": "Arvind Trader" },
+        };
 
-    const productSchema = {
-        "@context": "https://schema.org/",
-        "@type": "Product",
-        "name": product.name,
-        "image": [product.imageUrl],
-        "description": product.description,
-        "sku": `AT-CB-${product.id}`,
-        "mpn": `AT-MPN-CB-${product.id}`,
-        "category": "Packaging & Bags",
-        "brand": {
-          "@type": "Brand",
-          "name": "Arvind Trader"
-        },
-        "offers": {
-          "@type": "Offer",
-          "url": window.location.href,
-          "priceCurrency": "USD",
-          "price": product.price.toFixed(2),
-          "priceValidUntil": "2024-12-31",
-          "itemCondition": "https://schema.org/NewCondition",
-          "availability": "https://schema.org/InStock"
+        if (product.variants && product.variants.length > 0) {
+            const prices = product.variants.map(v => v.price);
+            return {
+                ...baseSchema,
+                "sku": `AT-CB-${product.id}`,
+                "mpn": `AT-MPN-CB-${product.id}`,
+                "offers": {
+                    "@type": "AggregateOffer",
+                    "priceCurrency": "INR",
+                    "lowPrice": Math.min(...prices).toFixed(2),
+                    "highPrice": Math.max(...prices).toFixed(2),
+                    "offerCount": product.variants.length,
+                    "availability": "https://schema.org/InStock"
+                }
+            };
         }
+
+        return {
+            ...baseSchema,
+            "sku": `AT-CB-${product.id}`,
+            "mpn": `AT-MPN-CB-${product.id}`,
+            "offers": {
+                "@type": "Offer",
+                "url": window.location.href,
+                "priceCurrency": "INR",
+                "price": product.price?.toFixed(2),
+                "priceValidUntil": "2024-12-31",
+                "itemCondition": "https://schema.org/NewCondition",
+                "availability": "https://schema.org/InStock"
+            }
+        };
     };
 
     return (
         <div className="container">
-            <JsonLd data={productSchema} />
+            <JsonLd data={getProductSchema()} />
             <div className="product-detail-container">
                 <div className="product-detail-image">
                     <img src={product.imageUrl} alt={product.name} />
                 </div>
                 <div className="product-detail-info">
                     <h1>{product.name}</h1>
-                    <p className="product-detail-price">${product.price.toFixed(2)}</p>
+                    <p className="product-detail-price">₹{(selectedVariant?.price || product.price || 0).toFixed(2)}</p>
                     <p className="product-detail-desc">{product.description}</p>
-                    <button onClick={() => addToCart(product)} className="btn">Add to Cart</button>
+
+                    {product.variants && (
+                      <div className="variant-selectors">
+                          <div className="variant-selector">
+                              <label htmlFor="variant-select">Options</label>
+                              <select id="variant-select" value={selectedVariant?.id} onChange={handleVariantChange}>
+                                {product.variants.map(v => (
+                                    <option key={v.id} value={v.id}>
+                                        {v.size} / {v.color} - ₹{v.price.toFixed(2)}
+                                    </option>
+                                ))}
+                              </select>
+                          </div>
+                      </div>
+                    )}
+                    
+                    <div className="discount-callout">
+                      For bulk orders and discounts, please <a href="tel:7644000929">call us at 7644000929</a>.
+                    </div>
+
+                    <button onClick={handleAddToCart} className="btn">Add to Cart</button>
                 </div>
             </div>
 
@@ -373,25 +481,29 @@ const CartPage = () => {
     return (
         <div className="container cart-container">
             <h1>Your Shopping Cart</h1>
-            {cartItems.map(item => (
-                <div key={item.id} className="cart-item">
-                    <img src={item.imageUrl} alt={item.name} className="cart-item-img" />
-                    <div className="cart-item-info">
-                        <h3 className="cart-item-name">{item.name}</h3>
-                        <p>${item.price.toFixed(2)}</p>
+            {cartItems.map(item => {
+                const cartItemId = `${item.product.id}-${item.variant.id}`;
+                return (
+                    <div key={cartItemId} className="cart-item">
+                        <img src={item.product.imageUrl} alt={item.product.name} className="cart-item-img" />
+                        <div className="cart-item-info">
+                            <h3 className="cart-item-name">{item.product.name}</h3>
+                            <p className="cart-item-variant">{item.variant.size} / {item.variant.color}</p>
+                            <p>₹{item.variant.price.toFixed(2)}</p>
+                        </div>
+                        <div className="quantity-controls">
+                            <button onClick={() => updateQuantity(cartItemId, item.quantity - 1)}>-</button>
+                            <span>{item.quantity}</span>
+                            <button onClick={() => updateQuantity(cartItemId, item.quantity + 1)}>+</button>
+                        </div>
+                        <p>₹{(item.variant.price * item.quantity).toFixed(2)}</p>
+                        <button onClick={() => removeFromCart(cartItemId)} className="btn btn-danger">Remove</button>
                     </div>
-                    <div className="quantity-controls">
-                        <button onClick={() => updateQuantity(item.id, item.quantity - 1)}>-</button>
-                        <span>{item.quantity}</span>
-                        <button onClick={() => updateQuantity(item.id, item.quantity + 1)}>+</button>
-                    </div>
-                    <p>${(item.price * item.quantity).toFixed(2)}</p>
-                    <button onClick={() => removeFromCart(item.id)} className="btn btn-danger">Remove</button>
-                </div>
-            ))}
+                );
+            })}
             <div className="cart-summary">
                  <h2>Order Summary</h2>
-                <p className="cart-total">Total: ${getCartTotal().toFixed(2)}</p>
+                <p className="cart-total">Total: ₹{getCartTotal().toFixed(2)}</p>
                 <Link href="/checkout" className="btn">Proceed to Checkout</Link>
             </div>
         </div>
@@ -428,7 +540,7 @@ const CheckoutPage = () => {
                         <label htmlFor="address">Shipping Address</label>
                         <input type="text" id="address" required />
                     </div>
-                    <h3>Total: ${getCartTotal().toFixed(2)}</h3>
+                    <h3>Total: ₹{getCartTotal().toFixed(2)}</h3>
                     <button type="submit" className="btn" style={{width: '100%', marginTop: '1rem'}}>Place Order</button>
                 </form>
             </div>
