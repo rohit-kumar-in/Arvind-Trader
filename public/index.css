@@ -159,6 +159,7 @@ img {
 
 .btn-secondary {
     background-color: #6c757d;
+    color: var(--text-light) !important;
 }
 .btn-secondary:hover {
     background-color: #5a6268;
@@ -537,7 +538,8 @@ img {
 }
 
 .form-group input,
-.form-group textarea {
+.form-group textarea,
+.form-group select {
   width: 100%;
   padding: 0.75rem;
   border: 1px solid var(--border-color);
@@ -574,6 +576,10 @@ img {
   padding: 1.5rem;
   margin-top: 2rem;
 }
+.app-footer a {
+    color: var(--accent-color);
+}
+
 
 /* Contact Us Form on About Page */
 .contact-form-container {
@@ -595,6 +601,68 @@ img {
   margin-right: auto;
   margin-bottom: 2rem;
   color: #555;
+}
+
+
+/* Admin Page */
+.admin-container {
+  background-color: #fff;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: var(--card-shadow);
+}
+
+.admin-product-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.admin-product-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+}
+
+.admin-product-item img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.admin-product-item span {
+  flex-grow: 1;
+  font-weight: 600;
+}
+
+.admin-product-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.admin-form-container {
+    max-width: 700px;
+    margin: 0 auto;
+    background: #fff;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: var(--card-shadow);
+}
+
+.admin-form .form-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+.image-preview {
+    max-width: 150px;
+    margin-top: 1rem;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
 }
 
 
@@ -628,5 +696,9 @@ img {
 
   .about-container {
     padding: 1.5rem;
+  }
+  .admin-product-item {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }

@@ -5,10 +5,11 @@
 import React, { useState, useEffect, createContext, useContext } from 'react';
 import { createRoot } from 'react-dom/client';
 import { AboutPage } from './AboutPage.tsx';
+import { AdminPage } from './AdminPage.tsx';
 
 // --- DATA & TYPES ---
 
-interface Variant {
+export interface Variant {
   id: number;
   size: string;
   color: string;
@@ -17,7 +18,7 @@ interface Variant {
   imageUrl?: string;
 }
 
-interface Product {
+export interface Product {
   id: number;
   name: string;
   description: string;
@@ -45,7 +46,7 @@ interface CartContextType {
 }
 
 
-const products: Product[] = [
+const initialProducts: Product[] = [
   { 
     id: 1, 
     name: 'Standard PP Carry Bag', 
@@ -248,7 +249,7 @@ const Header = () => {
 
 const Footer = () => (
     <footer className="app-footer">
-        <p>&copy; {new Date().getFullYear()} Arvind Trader. All Rights Reserved.</p>
+        <p>&copy; {new Date().getFullYear()} Arvind Trader. All Rights Reserved. | <Link href="/admin">Admin</Link></p>
     </footer>
 );
 
@@ -281,7 +282,7 @@ const ProductCard = ({ product }: { product: Product }) => {
 
 // --- PAGES ---
 
-const HomePage = () => {
+const HomePage = ({ products }: { products: Product[] }) => {
     useEffect(() => {
         updateSeoTags('Arvind Trader | Wholesale Carry Bags in Bhagalpur', 'Your one-stop shop for high-quality PP bags, non-woven bags, and custom printed carry bags. Serving Jagdishpur, Bhagalpur and nearby areas.');
     }, []);
@@ -316,7 +317,7 @@ const HomePage = () => {
     );
 };
 
-const ProductListPage = () => {
+const ProductListPage = ({ products }: { products: Product[] }) => {
     useEffect(() => {
         updateSeoTags('All Carry Bag Products | Arvind Trader', 'Browse our full collection of PP bags, non-woven bags, fabric totes, and more for all your packaging needs.');
     }, []);
@@ -333,7 +334,7 @@ const ProductListPage = () => {
     );
 };
 
-const ProductDetailPage = ({ id }: { id: number }) => {
+const ProductDetailPage = ({ id, products }: { id: number, products: Product[] }) => {
     const { addToCart } = useCart();
     const product = products.find(p => p.id === id);
 
@@ -615,6 +616,21 @@ const ConfirmationPage = () => {
 const App = () => {
     const path = usePath();
 
+    const [products, setProducts] = useState<Product[]>(() => {
+        try {
+            const savedProducts = localStorage.getItem('arvind-trader-products');
+            return savedProducts ? JSON.parse(savedProducts) : initialProducts;
+        } catch (error) {
+            console.error("Could not parse products from localStorage", error);
+            return initialProducts;
+        }
+    });
+
+    useEffect(() => {
+        localStorage.setItem('arvind-trader-products', JSON.stringify(products));
+    }, [products]);
+
+
     // Handle Google site verification file route
     if (path === '/googlef1dff6d4da7988a6.html') {
         // We render the verification string directly. This is a workaround
@@ -626,18 +642,19 @@ const App = () => {
     const parts = path.split('/').filter(Boolean);
 
     const renderPage = () => {
-        if (parts.length === 0) return <HomePage />;
-        if (parts[0] === 'products') return <ProductListPage />;
+        if (parts.length === 0) return <HomePage products={products} />;
+        if (parts[0] === 'products') return <ProductListPage products={products} />;
         if (parts[0] === 'product' && parts[1]) {
             const id = parseInt(parts[1], 10);
-            return <ProductDetailPage id={id} />;
+            return <ProductDetailPage id={id} products={products} />;
         }
         if (parts[0] === 'cart') return <CartPage />;
         if (parts[0] === 'about') return <AboutPage />;
         if (parts[0] === 'checkout') return <CheckoutPage />;
         if (parts[0] === 'confirmation') return <ConfirmationPage />;
+        if (parts[0] === 'admin') return <AdminPage products={products} setProducts={setProducts} />;
         
-        return <HomePage />; // Fallback to home page
+        return <HomePage products={products} />; // Fallback to home page
     };
 
     return (
