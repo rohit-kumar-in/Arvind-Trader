@@ -32,13 +32,18 @@ interface CartContextType {
 
 
 const products: Product[] = [
-  { id: 1, name: 'Wireless Noise-Cancelling Headphones', price: 249.99, description: 'Immerse yourself in music with these high-fidelity, noise-cancelling headphones. Long-lasting battery and comfortable design.', imageUrl: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=2070&auto=format&fit=crop' },
-  { id: 2, name: 'Smartwatch Series 7', price: 399.00, description: 'Stay connected and track your fitness goals. Features a bright always-on display and advanced health sensors.', imageUrl: 'https://images.unsplash.com/photo-1546868871-7041f2a55e12?q=80&w=1964&auto=format&fit=crop' },
-  { id: 3, name: 'Portable Bluetooth Speaker', price: 89.95, description: 'Take your music anywhere. This speaker is waterproof, dustproof, and delivers surprisingly powerful sound.', imageUrl: 'https://images.unsplash.com/photo-1589256469038-5961021415a7?q=80&w=1974&auto=format&fit=crop' },
-  { id: 4, name: '4K Ultra HD Streaming Device', price: 49.99, description: 'Upgrade your TV with stunning 4K streaming. Access all your favorite apps and services in one place.', imageUrl: 'https://images.unsplash.com/photo-1601944177324-697357493103?q=80&w=2070&auto=format&fit=crop' },
-  { id: 5, name: 'Ergonomic Mechanical Keyboard', price: 159.00, description: 'Type faster and more comfortably. Features customizable RGB lighting and satisfying tactile switches.', imageUrl: 'https://images.unsplash.com/photo-1618384887924-33634b398080?q=80&w=2070&auto=format&fit=crop' },
-  { id: 6, name: 'High-Performance Gaming Mouse', price: 79.99, description: 'Gain a competitive edge with this ultra-lightweight and responsive gaming mouse. Customizable buttons and precision sensor.', imageUrl: 'https://images.unsplash.com/photo-1615663245652-8de3ab723b53?q=80&w=1931&auto=format&fit=crop' },
+  { id: 1, name: 'Standard PP Carry Bag (10x14)', price: 0.15, description: 'Durable and lightweight PP (polypropylene) bags, perfect for retail stores and groceries. Standard 10x14 inch size.', imageUrl: 'https://images.unsplash.com/photo-1591543620767-54912b2a5a8a?q=80&w=2070&auto=format&fit=crop' },
+  { id: 2, name: 'Printed Non-Woven D-Cut Bag', price: 0.25, description: 'Eco-friendly non-woven fabric bags with a D-cut handle. Ideal for promotional events and boutiques. Custom printing available on bulk orders.', imageUrl: 'https://images.unsplash.com/photo-1623485790323-95f70a255956?q=80&w=1935&auto=format&fit=crop' },
+  { id: 3, name: 'Heavy Duty Grocery Bag (W-Cut)', price: 0.20, description: 'Strong, reusable W-cut (vest style) bags designed to carry heavy grocery items without tearing. A reliable choice for supermarkets.', imageUrl: 'https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=1974&auto=format&fit=crop' },
+  { id: 4, name: 'Custom Logo Fabric Tote Bag', price: 2.50, description: 'High-quality cotton fabric tote bags. Perfect for branding with your company logo. Stylish, washable, and reusable.', imageUrl: 'https://images.unsplash.com/photo-1544441893-675973e31985?q=80&w=2070&auto=format&fit=crop' },
+  { id: 5, name: 'Transparent Garment Bags', price: 0.50, description: 'Clear polythene bags to protect clothing from dust and moisture. Ideal for dry cleaners, laundromats, and boutiques.', imageUrl: 'https://images.unsplash.com/photo-1555529771-835f59fc5efe?q=80&w=1974&auto=format&fit=crop' },
+  { id: 6, name: 'Eco-Friendly Jute Shopping Bag', price: 3.00, description: 'A stylish and sustainable option. These sturdy jute bags are perfect for eco-conscious brands and customers.', imageUrl: 'https://images.unsplash.com/photo-1621495474723-38c642e05f6a?q=80&w=1964&auto=format&fit=crop' },
+  { id: 7, name: 'Brown Kraft Paper Bag with Handle', price: 0.40, description: 'Classic and recyclable brown paper bags with strong twisted paper handles. A great choice for restaurants, cafes, and retail shops.', imageUrl: 'https://images.unsplash.com/photo-1526310242159-7b33989fb51e?q=80&w=1974&auto=format&fit=crop' },
+  { id: 8, name: 'Tamper-Proof Courier Bags (100 Pack)', price: 15.00, description: 'Secure, self-sealing courier bags for e-commerce shipping. Tear-resistant and waterproof to protect contents.', imageUrl: 'https://images.unsplash.com/photo-1594894334346-a60205935b5b?q=80&w=2070&auto=format&fit=crop' },
+  { id: 9, name: 'Small Polythene Pouch Bags (5x7)', price: 0.05, description: 'Versatile small clear pouches for packing spices, hardware, or other small items. Available in various sizes.', imageUrl: 'https://images.unsplash.com/photo-1606554862580-0a544c4a4533?q=80&w=2070&auto=format&fit=crop' },
+  { id: 10, name: 'Large Industrial Packaging Bag', price: 1.20, description: 'Extra-large and durable woven polypropylene sack for bulk storage and transport of grains, sand, or construction materials.', imageUrl: 'https://images.unsplash.com/photo-1618218932159-dd404748115b?q=80&w=2070&auto=format&fit=crop' },
 ];
+
 
 // --- CART CONTEXT ---
 const CartContext = createContext<CartContextType | null>(null);
@@ -229,7 +234,7 @@ const ProductCard = ({ product }: { product: Product }) => {
 
 const HomePage = () => {
     useEffect(() => {
-        updateSeoTags('Arvind Trader | High-Quality Electronics', 'Your one-stop shop for the latest and greatest in tech. High-quality electronics, from headphones to smartwatches.');
+        updateSeoTags('Arvind Trader | Wholesale Carry Bags in Bhagalpur', 'Your one-stop shop for high-quality PP bags, non-woven bags, and custom printed carry bags. Serving Jagdishpur, Bhagalpur and nearby areas.');
     }, []);
     
     const organizationSchema = {
@@ -240,17 +245,18 @@ const HomePage = () => {
       "logo": "https://arvind-trader.vercel.app/logo.png", // Assume you have a logo
       "contactPoint": {
         "@type": "ContactPoint",
-        "telephone": "+1-800-555-0199",
+        "telephone": "7644000929",
         "contactType": "customer service"
-      }
+      },
+      "description": "Wholesale and retail supplier of carry bags in Jagdishpur, Bhagalpur, Bihar."
     };
 
     return (
         <div className="container">
             <JsonLd data={organizationSchema} />
             <div className="hero">
-                <h1>Welcome to Arvind Trader</h1>
-                <p>Your one-stop shop for the latest and greatest in tech.</p>
+                <h1>Wholesale Carry Bags for Your Business</h1>
+                <p>High-quality PP, Non-Woven, and Custom Bags at Bhagalpur Market Rates.</p>
                 <Link href="/products" className="btn">Shop Now</Link>
             </div>
             <h2>Featured Products</h2>
@@ -263,7 +269,7 @@ const HomePage = () => {
 
 const ProductListPage = () => {
     useEffect(() => {
-        updateSeoTags('All Products | Arvind Trader', 'Browse our full collection of high-quality electronic gadgets and accessories.');
+        updateSeoTags('All Carry Bag Products | Arvind Trader', 'Browse our full collection of PP bags, non-woven bags, fabric totes, and more for all your packaging needs.');
     }, []);
     return (
         <div className="container">
@@ -302,8 +308,9 @@ const ProductDetailPage = ({ id }: { id: number }) => {
         "name": product.name,
         "image": [product.imageUrl],
         "description": product.description,
-        "sku": `AT-${product.id}`,
-        "mpn": `AT-MPN-${product.id}`,
+        "sku": `AT-CB-${product.id}`,
+        "mpn": `AT-MPN-CB-${product.id}`,
+        "category": "Packaging & Bags",
         "brand": {
           "@type": "Brand",
           "name": "Arvind Trader"
