@@ -4,6 +4,7 @@
 */
 import React, { useState, useEffect, createContext, useContext } from 'react';
 import { createRoot } from 'react-dom/client';
+import { AboutPage } from './AboutPage.tsx';
 
 // --- DATA & TYPES ---
 
@@ -130,7 +131,7 @@ const Link = ({ href, children, className }: { href: string, children: React.Rea
 
 
 // --- SEO HELPERS ---
-const updateSeoTags = (title: string, description: string, imageUrl?: string) => {
+export const updateSeoTags = (title: string, description: string, imageUrl?: string) => {
   document.title = title;
 
   const setMeta = (name: string, property: string, content: string) => {
@@ -189,6 +190,7 @@ const Header = () => {
                 <nav className="nav-links">
                     <Link href="/">Home</Link>
                     <Link href="/products">Products</Link>
+                    <Link href="/about">About Us</Link>
                 </nav>
                 <Link href="/cart" className="cart-icon" aria-label={`Shopping cart with ${itemCount} items`}>
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
@@ -289,6 +291,11 @@ const ProductDetailPage = ({ id }: { id: number }) => {
         return <div className="container"><h2>Product not found!</h2></div>;
     }
 
+    const relatedProducts = products
+        .filter(p => p.id !== product.id)
+        .sort(() => 0.5 - Math.random())
+        .slice(0, 3);
+
     const productSchema = {
         "@context": "https://schema.org/",
         "@type": "Product",
@@ -326,6 +333,15 @@ const ProductDetailPage = ({ id }: { id: number }) => {
                     <button onClick={() => addToCart(product)} className="btn">Add to Cart</button>
                 </div>
             </div>
+
+            {relatedProducts.length > 0 && (
+                <div className="related-products">
+                    <h2>You Might Also Like</h2>
+                    <div className="product-grid">
+                        {relatedProducts.map(related => <ProductCard key={related.id} product={related} />)}
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
@@ -440,6 +456,7 @@ const App = () => {
             return <ProductDetailPage id={id} />;
         }
         if (parts[0] === 'cart') return <CartPage />;
+        if (parts[0] === 'about') return <AboutPage />;
         if (parts[0] === 'checkout') return <CheckoutPage />;
         if (parts[0] === 'confirmation') return <ConfirmationPage />;
         
