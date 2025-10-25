@@ -3,10 +3,34 @@
  * SPDX-License-Identifier: Apache-2.0
 */
 import React, { useState, useEffect, createContext, useContext } from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 
-// --- DATA ---
-const products = [
+// --- DATA & TYPES ---
+
+interface Product {
+  id: number;
+  name: string;
+  price: number;
+  description: string;
+  imageUrl: string;
+}
+
+interface CartItem extends Product {
+  quantity: number;
+}
+
+interface CartContextType {
+  cartItems: CartItem[];
+  addToCart: (product: Product, quantity?: number) => void;
+  updateQuantity: (productId: number, newQuantity: number) => void;
+  removeFromCart: (productId: number) => void;
+  getCartTotal: () => number;
+  getCartItemCount: () => number;
+  clearCart: () => void;
+}
+
+
+const products: Product[] = [
   { id: 1, name: 'Wireless Noise-Cancelling Headphones', price: 249.99, description: 'Immerse yourself in music with these high-fidelity, noise-cancelling headphones. Long-lasting battery and comfortable design.', imageUrl: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=2070&auto=format&fit=crop' },
   { id: 2, name: 'Smartwatch Series 7', price: 399.00, description: 'Stay connected and track your fitness goals. Features a bright always-on display and advanced health sensors.', imageUrl: 'https://images.unsplash.com/photo-1546868871-7041f2a55e12?q=80&w=1964&auto=format&fit=crop' },
   { id: 3, name: 'Portable Bluetooth Speaker', price: 89.95, description: 'Take your music anywhere. This speaker is waterproof, dustproof, and delivers surprisingly powerful sound.', imageUrl: 'https://images.unsplash.com/photo-1589256469038-5961021415a7?q=80&w=1974&auto=format&fit=crop' },
@@ -16,13 +40,12 @@ const products = [
 ];
 
 // --- CART CONTEXT ---
-const CartContext = createContext(null);
+const CartContext = createContext<CartContextType | null>(null);
 
-// FIX: Add explicit type for children prop to resolve type inference issues.
 export const CartProvider = ({ children }: { children: React.ReactNode }) => {
-  const [cartItems, setCartItems] = useState([]);
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
 
-  const addToCart = (product, quantity = 1) => {
+  const addToCart = (product: Product, quantity = 1) => {
     setCartItems(prevItems => {
       const existingItem = prevItems.find(item => item.id === product.id);
       if (existingItem) {
@@ -34,7 +57,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     });
   };
 
-  const updateQuantity = (productId, newQuantity) => {
+  const updateQuantity = (productId: number, newQuantity: number) => {
     if (newQuantity <= 0) {
       removeFromCart(productId);
     } else {
@@ -46,7 +69,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
   
-  const removeFromCart = (productId) => {
+  const removeFromCart = (productId: number) => {
     setCartItems(prevItems => prevItems.filter(item => item.id !== productId));
   };
   
@@ -69,7 +92,13 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-export const useCart = () => useContext(CartContext);
+export const useCart = () => {
+    const context = useContext(CartContext);
+    if (!context) {
+        throw new Error('useCart must be used within a CartProvider');
+    }
+    return context;
+};
 
 
 // --- ROUTING ---
@@ -87,11 +116,12 @@ const useHashNavigation = () => {
     return hash;
 }
 
-const parseRoute = (hash) => {
+const parseRoute = (hash: string) => {
     const path = hash.substring(1) || '/';
     const parts = path.split('/');
+    if(parts[1] === 'products') return { page: 'products' };
     if(parts[1] === 'product' && parts[2]) {
-        return { page: 'product', id: parseInt(parts[2]) };
+        return { page: 'product', id: parseInt(parts[2], 10) };
     }
     if(parts[1] === 'cart') return { page: 'cart' };
     if(parts[1] === 'checkout') return { page: 'checkout' };
@@ -129,8 +159,7 @@ const Footer = () => (
     </footer>
 );
 
-// FIX: Add explicit type for product prop to resolve assignment errors in lists.
-const ProductCard = ({ product }: { product: typeof products[0] }) => {
+const ProductCard = ({ product }: { product: Product }) => {
     const { addToCart } = useCart();
     return (
         <div className="product-card">
@@ -173,7 +202,6 @@ const ProductListPage = () => (
     </div>
 );
 
-// FIX: Add explicit type for id prop for type safety.
 const ProductDetailPage = ({ id }: { id: number }) => {
     const { addToCart } = useCart();
     const product = products.find(p => p.id === id);
@@ -243,7 +271,7 @@ const CartPage = () => {
 const CheckoutPage = () => {
     const { getCartTotal, clearCart } = useCart();
 
-    const handleSubmit = (e) => {
+    const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         clearCart();
         window.location.hash = '#/confirmation';
@@ -291,12 +319,14 @@ const App = () => {
 
     const renderPage = () => {
         switch (page) {
-            case 'product': return <ProductDetailPage id={id} />;
+            case 'product': return <ProductDetailPage id={id!} />;
             case 'cart': return <CartPage />;
             case 'checkout': return <CheckoutPage />;
             case 'confirmation': return <ConfirmationPage />;
-            case 'home': return <HomePage />;
-            default: return <ProductListPage />;
+            case 'products': return <ProductListPage />;
+            case 'home':
+            default:
+              return <HomePage />;
         }
     }
 
@@ -311,4 +341,8 @@ const App = () => {
     );
 };
 
-ReactDOM.render(<App />, document.getElementById('root'));
+const container = document.getElementById('root');
+if (container) {
+  const root = createRoot(container);
+  root.render(<App />);
+}
