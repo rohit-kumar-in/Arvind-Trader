@@ -102,36 +102,45 @@ export const useCart = () => {
 
 
 // --- ROUTING ---
-const useHashNavigation = () => {
-    const [hash, setHash] = useState(window.location.hash);
+const navigate = (href: string) => {
+    window.history.pushState({}, '', href);
+    // Dispatch a popstate event to make the router update
+    const navEvent = new PopStateEvent('popstate');
+    window.dispatchEvent(navEvent);
+};
 
+const usePath = () => {
+    const [path, setPath] = useState(window.location.pathname);
     useEffect(() => {
-        const handleHashChange = () => {
-            setHash(window.location.hash);
+        const onLocationChange = () => {
+            setPath(window.location.pathname);
         };
-        window.addEventListener('hashchange', handleHashChange);
-        return () => window.removeEventListener('hashchange', handleHashChange);
+        window.addEventListener('popstate', onLocationChange);
+        return () => window.removeEventListener('popstate', onLocationChange);
     }, []);
-    
-    return hash;
-}
+    return path;
+};
 
-const parseRoute = (hash: string) => {
-    const path = hash.substring(1) || '/';
-    const parts = path.split('/');
-    if(parts[1] === 'products') return { page: 'products' };
-    if(parts[1] === 'product' && parts[2]) {
-        return { page: 'product', id: parseInt(parts[2], 10) };
-    }
-    if(parts[1] === 'cart') return { page: 'cart' };
-    if(parts[1] === 'checkout') return { page: 'checkout' };
-    if(parts[1] === 'confirmation') return { page: 'confirmation' };
-    return { page: 'home' };
-}
+const Link = ({ href, children, className }: { href: string, children: React.ReactNode, className?: string }) => {
+    const onClick = (event: React.MouseEvent) => {
+        event.preventDefault();
+        navigate(href);
+    };
+    return <a href={href} onClick={onClick} className={className}>{children}</a>;
+};
+
+
+// --- HELPERS ---
+const updateMeta = (title: string, description: string) => {
+  document.title = title;
+  const metaDescription = document.querySelector('meta[name="description"]');
+  if (metaDescription) {
+    metaDescription.setAttribute('content', description);
+  }
+};
 
 
 // --- COMPONENTS ---
-
 const Header = () => {
     const { getCartItemCount } = useCart();
     const itemCount = getCartItemCount();
@@ -139,15 +148,15 @@ const Header = () => {
     return (
         <header className="app-header">
             <div className="header-content">
-                <a href="#/" className="logo">Arvind Trader</a>
+                <Link href="/" className="logo">Arvind Trader</Link>
                 <nav className="nav-links">
-                    <a href="#/">Home</a>
-                    <a href="#/products">Products</a>
+                    <Link href="/">Home</Link>
+                    <Link href="/products">Products</Link>
                 </nav>
-                <a href="#/cart" className="cart-icon" aria-label={`Shopping cart with ${itemCount} items`}>
+                <Link href="/cart" className="cart-icon" aria-label={`Shopping cart with ${itemCount} items`}>
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
                     {itemCount > 0 && <span className="cart-badge">{itemCount}</span>}
-                </a>
+                </Link>
             </div>
         </header>
     );
@@ -163,12 +172,12 @@ const ProductCard = ({ product }: { product: Product }) => {
     const { addToCart } = useCart();
     return (
         <div className="product-card">
-            <a href={`#/product/${product.id}`}>
+            <Link href={`/product/${product.id}`}>
                 <img src={product.imageUrl} alt={product.name} className="product-image" />
                 <div className="product-info">
                     <h3 className="product-name">{product.name}</h3>
                 </div>
-            </a>
+            </Link>
              <div className="product-info">
                 <p className="product-price">${product.price.toFixed(2)}</p>
                 <button onClick={() => addToCart(product)} className="btn">Add to Cart</button>
@@ -179,32 +188,50 @@ const ProductCard = ({ product }: { product: Product }) => {
 
 // --- PAGES ---
 
-const HomePage = () => (
-    <div className="container">
-        <div className="hero">
-            <h1>Welcome to Arvind Trader</h1>
-            <p>Your one-stop shop for the latest and greatest in tech.</p>
-            <a href="#/products" className="btn">Shop Now</a>
+const HomePage = () => {
+    useEffect(() => {
+        updateMeta('Arvind Trader | High-Quality Electronics', 'Your one-stop shop for the latest and greatest in tech. High-quality electronics, from headphones to smartwatches.');
+    }, []);
+    return (
+        <div className="container">
+            <div className="hero">
+                <h1>Welcome to Arvind Trader</h1>
+                <p>Your one-stop shop for the latest and greatest in tech.</p>
+                <Link href="/products" className="btn">Shop Now</Link>
+            </div>
+            <h2>Featured Products</h2>
+            <div className="product-grid">
+                {products.slice(0, 3).map(product => <ProductCard key={product.id} product={product} />)}
+            </div>
         </div>
-        <h2>Featured Products</h2>
-        <div className="product-grid">
-            {products.slice(0, 3).map(product => <ProductCard key={product.id} product={product} />)}
-        </div>
-    </div>
-);
+    );
+};
 
-const ProductListPage = () => (
-    <div className="container">
-        <h1>All Products</h1>
-        <div className="product-grid">
-            {products.map(product => <ProductCard key={product.id} product={product} />)}
+const ProductListPage = () => {
+    useEffect(() => {
+        updateMeta('All Products | Arvind Trader', 'Browse our full collection of high-quality electronic gadgets and accessories.');
+    }, []);
+    return (
+        <div className="container">
+            <h1>All Products</h1>
+            <div className="product-grid">
+                {products.map(product => <ProductCard key={product.id} product={product} />)}
+            </div>
         </div>
-    </div>
-);
+    );
+};
 
 const ProductDetailPage = ({ id }: { id: number }) => {
     const { addToCart } = useCart();
     const product = products.find(p => p.id === id);
+
+    useEffect(() => {
+        if (product) {
+            updateMeta(`${product.name} | Arvind Trader`, product.description);
+        } else {
+            updateMeta('Product Not Found | Arvind Trader', 'The product you are looking for does not exist.');
+        }
+    }, [product]);
 
     if (!product) {
         return <div className="container"><h2>Product not found!</h2></div>;
@@ -229,13 +256,17 @@ const ProductDetailPage = ({ id }: { id: number }) => {
 
 const CartPage = () => {
     const { cartItems, updateQuantity, removeFromCart, getCartTotal } = useCart();
+    
+    useEffect(() => {
+        updateMeta('Your Shopping Cart | Arvind Trader', 'Review, update, or remove items from your shopping cart before proceeding to checkout.');
+    }, []);
 
     if (cartItems.length === 0) {
         return (
             <div className="container empty-cart">
                 <h2>Your Cart is Empty</h2>
                 <p>Looks like you haven't added anything to your cart yet.</p>
-                <a href="#/products" className="btn">Start Shopping</a>
+                <Link href="/products" className="btn">Start Shopping</Link>
             </div>
         );
     }
@@ -262,7 +293,7 @@ const CartPage = () => {
             <div className="cart-summary">
                  <h2>Order Summary</h2>
                 <p className="cart-total">Total: ${getCartTotal().toFixed(2)}</p>
-                <a href="#/checkout" className="btn">Proceed to Checkout</a>
+                <Link href="/checkout" className="btn">Proceed to Checkout</Link>
             </div>
         </div>
     );
@@ -270,11 +301,15 @@ const CartPage = () => {
 
 const CheckoutPage = () => {
     const { getCartTotal, clearCart } = useCart();
+    
+    useEffect(() => {
+        updateMeta('Checkout | Arvind Trader', 'Complete your purchase by providing your shipping and payment information.');
+    }, []);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         clearCart();
-        window.location.hash = '#/confirmation';
+        navigate('/confirmation');
     };
 
     return (
@@ -302,33 +337,38 @@ const CheckoutPage = () => {
     );
 }
 
-const ConfirmationPage = () => (
-    <div className="container confirmation-page">
-        <h1>Thank You For Your Order!</h1>
-        <p>Your order has been placed successfully. We'll send you an email confirmation shortly.</p>
-        <a href="#/" className="btn">Continue Shopping</a>
-    </div>
-);
+const ConfirmationPage = () => {
+    useEffect(() => {
+        updateMeta('Order Confirmed! | Arvind Trader', 'Thank you for your purchase from Arvind Trader.');
+    }, []);
+    return (
+        <div className="container confirmation-page">
+            <h1>Thank You For Your Order!</h1>
+            <p>Your order has been placed successfully. We'll send you an email confirmation shortly.</p>
+            <Link href="/" className="btn">Continue Shopping</Link>
+        </div>
+    );
+};
 
 
 // --- APP ---
-
 const App = () => {
-    const hash = useHashNavigation();
-    const { page, id } = parseRoute(hash);
+    const path = usePath();
+    const parts = path.split('/').filter(Boolean);
 
     const renderPage = () => {
-        switch (page) {
-            case 'product': return <ProductDetailPage id={id!} />;
-            case 'cart': return <CartPage />;
-            case 'checkout': return <CheckoutPage />;
-            case 'confirmation': return <ConfirmationPage />;
-            case 'products': return <ProductListPage />;
-            case 'home':
-            default:
-              return <HomePage />;
+        if (parts.length === 0) return <HomePage />;
+        if (parts[0] === 'products') return <ProductListPage />;
+        if (parts[0] === 'product' && parts[1]) {
+            const id = parseInt(parts[1], 10);
+            return <ProductDetailPage id={id} />;
         }
-    }
+        if (parts[0] === 'cart') return <CartPage />;
+        if (parts[0] === 'checkout') return <CheckoutPage />;
+        if (parts[0] === 'confirmation') return <ConfirmationPage />;
+        
+        return <HomePage />; // Fallback to home page
+    };
 
     return (
         <CartProvider>
@@ -341,8 +381,22 @@ const App = () => {
     );
 };
 
+// This handles the initial load for path-based routing on a static server
+// It ensures that if a user directly navigates to /products, it renders correctly.
 const container = document.getElementById('root');
 if (container) {
+  // All clicks on <a> tags are intercepted to use client-side routing.
+  document.addEventListener('click', (e) => {
+    const anchor = (e.target as HTMLElement).closest('a');
+    if (anchor && anchor.href && anchor.target !== '_blank') {
+      const url = new URL(anchor.href);
+      if (url.origin === window.location.origin) {
+        e.preventDefault();
+        navigate(url.pathname);
+      }
+    }
+  });
+
   const root = createRoot(container);
   root.render(<App />);
 }
