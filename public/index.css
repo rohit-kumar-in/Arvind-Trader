@@ -151,6 +151,12 @@ img {
   transform: translateY(1px);
 }
 
+.btn:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
+    opacity: 0.65;
+}
+
 .btn-secondary {
     background-color: #6c757d;
 }
@@ -257,6 +263,7 @@ img {
     width: 100%;
     border-radius: 8px;
     box-shadow: var(--card-shadow);
+    transition: opacity 0.3s ease-in-out;
 }
 
 .product-detail-info h1 {
@@ -288,7 +295,8 @@ img {
 
 .variant-selectors {
   display: flex;
-  gap: 1rem;
+  flex-direction: column;
+  gap: 1.5rem;
   margin-bottom: 1.5rem;
 }
 
@@ -299,7 +307,8 @@ img {
 .variant-selector label {
   display: block;
   margin-bottom: 0.5rem;
-  font-weight: 500;
+  font-weight: 600;
+  color: var(--primary-color);
 }
 
 .variant-selector select {
@@ -310,7 +319,44 @@ img {
   font-size: 1rem;
   font-family: var(--font-family);
   background-color: #fff;
+  cursor: pointer;
 }
+
+/* New Color Swatch Styles */
+.color-selector {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.color-swatch {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid var(--border-color);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  padding: 0;
+  font-size: 0; /* Hide text if any */
+}
+
+.color-swatch:hover {
+  transform: scale(1.1);
+}
+
+.color-swatch.active {
+  border-color: var(--secondary-color);
+  box-shadow: 0 0 0 2px var(--secondary-color);
+}
+
+.color-swatch[style*="white"] {
+    background-color: #f8f9fa; /* Off-white to be visible */
+}
+
+.color-swatch[style*="black"] {
+    background-color: #212529;
+}
+
 
 .discount-callout {
     background-color: #e7f3ff;

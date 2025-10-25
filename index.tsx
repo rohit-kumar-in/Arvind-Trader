@@ -14,6 +14,7 @@ interface Variant {
   color: string;
   price: number;
   sku: string;
+  imageUrl?: string;
 }
 
 interface Product {
@@ -51,14 +52,14 @@ const products: Product[] = [
     description: 'Durable and lightweight PP (polypropylene) bags, perfect for retail stores and groceries. Available in multiple sizes and colors.', 
     imageUrl: 'https://i.imgur.com/8L5s2aN.jpeg',
     variants: [
-        { id: 101, size: '500g', color: 'White', price: 150, sku: 'PP-500-W' },
-        { id: 102, size: '500g', color: 'Black', price: 160, sku: 'PP-500-B' },
-        { id: 103, size: '1kg', color: 'White', price: 250, sku: 'PP-1KG-W' },
-        { id: 104, size: '1kg', color: 'Black', price: 265, sku: 'PP-1KG-B' },
-        { id: 105, size: '2kg', color: 'White', price: 400, sku: 'PP-2KG-W' },
-        { id: 106, size: '2kg', color: 'Black', price: 420, sku: 'PP-2KG-B' },
-        { id: 107, size: '5kg', color: 'White', price: 600, sku: 'PP-5KG-W' },
-        { id: 108, size: '5kg', color: 'Black', price: 630, sku: 'PP-5KG-B' },
+        { id: 101, size: '500g', color: 'White', price: 150, sku: 'PP-500-W', imageUrl: 'https://i.imgur.com/8L5s2aN.jpeg' },
+        { id: 102, size: '500g', color: 'Black', price: 160, sku: 'PP-500-B', imageUrl: 'https://images.unsplash.com/photo-1593881231453-27c14a2913b7?q=80&w=1974&auto=format&fit=crop' },
+        { id: 103, size: '1kg', color: 'White', price: 250, sku: 'PP-1KG-W', imageUrl: 'https://i.imgur.com/8L5s2aN.jpeg' },
+        { id: 104, size: '1kg', color: 'Black', price: 265, sku: 'PP-1KG-B', imageUrl: 'https://images.unsplash.com/photo-1593881231453-27c14a2913b7?q=80&w=1974&auto=format&fit=crop' },
+        { id: 105, size: '2kg', color: 'White', price: 400, sku: 'PP-2KG-W', imageUrl: 'https://i.imgur.com/8L5s2aN.jpeg' },
+        { id: 106, size: '2kg', color: 'Black', price: 420, sku: 'PP-2KG-B', imageUrl: 'https://images.unsplash.com/photo-1593881231453-27c14a2913b7?q=80&w=1974&auto=format&fit=crop' },
+        { id: 107, size: '5kg', color: 'White', price: 600, sku: 'PP-5KG-W', imageUrl: 'https://i.imgur.com/8L5s2aN.jpeg' },
+        { id: 108, size: '5kg', color: 'Black', price: 630, sku: 'PP-5KG-B', imageUrl: 'https://images.unsplash.com/photo-1593881231453-27c14a2913b7?q=80&w=1974&auto=format&fit=crop' },
     ]
   },
   { id: 2, name: 'Printed Non-Woven D-Cut Bag', price: 300, description: 'Eco-friendly non-woven fabric bags with a D-cut handle. Ideal for promotional events and boutiques. Price per 100 pieces. Custom printing available on bulk orders.', imageUrl: 'https://images.unsplash.com/photo-1623485790323-95f70a255956?q=80&w=1935&auto=format&fit=crop' },
@@ -335,15 +336,33 @@ const ProductDetailPage = ({ id }: { id: number }) => {
     const { addToCart } = useCart();
     const product = products.find(p => p.id === id);
 
+    const [selectedColor, setSelectedColor] = useState<string | null>(product?.variants ? product.variants[0].color : null);
+    const [selectedSize, setSelectedSize] = useState<string | null>(product?.variants ? product.variants[0].size : null);
     const [selectedVariant, setSelectedVariant] = useState<Variant | null>(product?.variants ? product.variants[0] : null);
+    const [currentImage, setCurrentImage] = useState<string | undefined>(product?.imageUrl);
+    
+    useEffect(() => {
+        if (product?.variants && selectedColor && selectedSize) {
+            const newVariant = product.variants.find(v => v.color === selectedColor && v.size === selectedSize);
+            setSelectedVariant(newVariant || null);
+        }
+    }, [product, selectedColor, selectedSize]);
+
+    useEffect(() => {
+      if (selectedVariant?.imageUrl) {
+        setCurrentImage(selectedVariant.imageUrl);
+      } else if (product?.imageUrl) {
+        setCurrentImage(product.imageUrl);
+      }
+    }, [selectedVariant, product]);
 
     useEffect(() => {
         if (product) {
-            updateSeoTags(`${product.name} | Arvind Trader`, product.description, product.imageUrl);
+            updateSeoTags(`${product.name} | Arvind Trader`, product.description, currentImage);
         } else {
             updateSeoTags('Product Not Found | Arvind Trader', 'The product you are looking for does not exist.');
         }
-    }, [product]);
+    }, [product, currentImage]);
 
     if (!product) {
         return <div className="container"><h2>Product not found!</h2></div>;
@@ -353,16 +372,22 @@ const ProductDetailPage = ({ id }: { id: number }) => {
         if (product.variants && selectedVariant) {
             addToCart(product, selectedVariant, 1);
         } else if (product.price) {
-            // Fallback for simple products
             const simpleVariant: Variant = { id: product.id, price: product.price, sku: `AT-CB-${product.id}`, size: 'Standard', color: 'N/A' };
             addToCart(product, simpleVariant, 1);
         }
     };
     
-    const handleVariantChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const variantId = parseInt(e.target.value, 10);
-        const newVariant = product.variants?.find(v => v.id === variantId) || null;
-        setSelectedVariant(newVariant);
+    const handleColorChange = (color: string) => {
+        setSelectedColor(color);
+        const isCurrentSizeAvailable = product.variants?.some(v => v.color === color && v.size === selectedSize);
+        if (!isCurrentSizeAvailable) {
+            const firstAvailableSize = product.variants?.find(v => v.color === color)?.size;
+            setSelectedSize(firstAvailableSize || null);
+        }
+    };
+
+    const handleSizeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setSelectedSize(e.target.value);
     };
 
     const relatedProducts = products
@@ -414,12 +439,15 @@ const ProductDetailPage = ({ id }: { id: number }) => {
         };
     };
 
+    const uniqueColors = product.variants ? [...new Set(product.variants.map(v => v.color))] : [];
+    const availableSizes = product.variants ? product.variants.filter(v => v.color === selectedColor).map(v => v.size) : [];
+
     return (
         <div className="container">
             <JsonLd data={getProductSchema()} />
             <div className="product-detail-container">
                 <div className="product-detail-image">
-                    <img src={product.imageUrl} alt={product.name} />
+                    <img src={currentImage} alt={`${product.name} - ${selectedColor}`} />
                 </div>
                 <div className="product-detail-info">
                     <h1>{product.name}</h1>
@@ -428,16 +456,36 @@ const ProductDetailPage = ({ id }: { id: number }) => {
 
                     {product.variants && (
                       <div className="variant-selectors">
-                          <div className="variant-selector">
-                              <label htmlFor="variant-select">Options</label>
-                              <select id="variant-select" value={selectedVariant?.id} onChange={handleVariantChange}>
-                                {product.variants.map(v => (
-                                    <option key={v.id} value={v.id}>
-                                        {v.size} / {v.color} - ₹{v.price.toFixed(2)}
-                                    </option>
+                        {uniqueColors.length > 0 && (
+                            <div className="variant-selector">
+                              <label>Color</label>
+                              <div className="color-selector">
+                                {uniqueColors.map(color => (
+                                  <button 
+                                    key={color} 
+                                    className={`color-swatch ${selectedColor === color ? 'active' : ''}`}
+                                    style={{ backgroundColor: color.toLowerCase() }}
+                                    onClick={() => handleColorChange(color)}
+                                    aria-label={`Select color ${color}`}
+                                    title={color}
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          
+                          {availableSizes.length > 0 && (
+                            <div className="variant-selector">
+                              <label htmlFor="size-select">Size</label>
+                              <select id="size-select" value={selectedSize || ''} onChange={handleSizeChange}>
+                                {availableSizes.map(size => (
+                                  <option key={size} value={size}>
+                                    {size}
+                                  </option>
                                 ))}
                               </select>
-                          </div>
+                            </div>
+                          )}
                       </div>
                     )}
                     
@@ -445,7 +493,7 @@ const ProductDetailPage = ({ id }: { id: number }) => {
                       For bulk orders and discounts, please <a href="tel:7644000929">call us at 7644000929</a>.
                     </div>
 
-                    <button onClick={handleAddToCart} className="btn">Add to Cart</button>
+                    <button onClick={handleAddToCart} className="btn" disabled={!selectedVariant && !!product.variants}>Add to Cart</button>
                 </div>
             </div>
 
@@ -485,7 +533,7 @@ const CartPage = () => {
                 const cartItemId = `${item.product.id}-${item.variant.id}`;
                 return (
                     <div key={cartItemId} className="cart-item">
-                        <img src={item.product.imageUrl} alt={item.product.name} className="cart-item-img" />
+                        <img src={item.variant.imageUrl || item.product.imageUrl} alt={item.product.name} className="cart-item-img" />
                         <div className="cart-item-info">
                             <h3 className="cart-item-name">{item.product.name}</h3>
                             <p className="cart-item-variant">{item.variant.size} / {item.variant.color}</p>
