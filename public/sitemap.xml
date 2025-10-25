@@ -2,67 +2,86 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://arvind-trader.vercel.app/</loc>
-    <lastmod>2024-05-21</lastmod>
+    <lastmod>2024-05-22</lastmod>
+    <changefreq>daily</changefreq>
     <priority>1.00</priority>
   </url>
   <url>
     <loc>https://arvind-trader.vercel.app/products</loc>
-    <lastmod>2024-05-21</lastmod>
-    <priority>0.80</priority>
+    <lastmod>2024-05-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.90</priority>
+  </url>
+   <url>
+    <loc>https://arvind-trader.vercel.app/about</loc>
+    <lastmod>2024-05-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.70</priority>
   </url>
   <url>
     <loc>https://arvind-trader.vercel.app/cart</loc>
-    <lastmod>2024-05-21</lastmod>
-    <priority>0.60</priority>
+    <lastmod>2024-05-22</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.50</priority>
   </url>
   <url>
     <loc>https://arvind-trader.vercel.app/product/1</loc>
-    <lastmod>2024-05-21</lastmod>
+    <lastmod>2024-05-22</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.90</priority>
   </url>
   <url>
     <loc>https://arvind-trader.vercel.app/product/2</loc>
-    <lastmod>2024-05-21</lastmod>
+    <lastmod>2024-05-22</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.90</priority>
   </url>
   <url>
     <loc>https://arvind-trader.vercel.app/product/3</loc>
-    <lastmod>2024-05-21</lastmod>
+    <lastmod>2024-05-22</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.90</priority>
   </url>
   <url>
     <loc>https://arvind-trader.vercel.app/product/4</loc>
-    <lastmod>2024-05-21</lastmod>
+    <lastmod>2024-05-22</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.90</priority>
   </url>
   <url>
     <loc>https://arvind-trader.vercel.app/product/5</loc>
-    <lastmod>2024-05-21</lastmod>
+    <lastmod>2024-05-22</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.90</priority>
   </url>
   <url>
     <loc>https://arvind-trader.vercel.app/product/6</loc>
-    <lastmod>2024-05-21</lastmod>
+    <lastmod>2024-05-22</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.90</priority>
   </url>
   <url>
     <loc>https://arvind-trader.vercel.app/product/7</loc>
-    <lastmod>2024-05-21</lastmod>
+    <lastmod>2024-05-22</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.90</priority>
   </url>
   <url>
     <loc>https://arvind-trader.vercel.app/product/8</loc>
-    <lastmod>2024-05-21</lastmod>
+    <lastmod>2024-05-22</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.90</priority>
   </url>
   <url>
     <loc>https://arvind-trader.vercel.app/product/9</loc>
-    <lastmod>2024-05-21</lastmod>
+    <lastmod>2024-05-22</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.90</priority>
   </url>
   <url>
     <loc>https://arvind-trader.vercel.app/product/10</loc>
-    <lastmod>2024-05-21</lastmod>
+    <lastmod>2024-05-22</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.90</priority>
   </url>
 </urlset>

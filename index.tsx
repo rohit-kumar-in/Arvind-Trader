@@ -53,24 +53,24 @@ const products: Product[] = [
     imageUrl: 'https://i.imgur.com/8L5s2aN.jpeg',
     variants: [
         { id: 101, size: '500g', color: 'White', price: 150, sku: 'PP-500-W', imageUrl: 'https://i.imgur.com/8L5s2aN.jpeg' },
-        { id: 102, size: '500g', color: 'Black', price: 160, sku: 'PP-500-B', imageUrl: 'https://images.unsplash.com/photo-1593881231453-27c14a2913b7?q=80&w=1974&auto=format&fit=crop' },
+        { id: 102, size: '500g', color: 'Black', price: 160, sku: 'PP-500-B', imageUrl: 'https://i.imgur.com/TpHy2P5.jpeg' },
         { id: 103, size: '1kg', color: 'White', price: 250, sku: 'PP-1KG-W', imageUrl: 'https://i.imgur.com/8L5s2aN.jpeg' },
-        { id: 104, size: '1kg', color: 'Black', price: 265, sku: 'PP-1KG-B', imageUrl: 'https://images.unsplash.com/photo-1593881231453-27c14a2913b7?q=80&w=1974&auto=format&fit=crop' },
+        { id: 104, size: '1kg', color: 'Black', price: 265, sku: 'PP-1KG-B', imageUrl: 'https://i.imgur.com/TpHy2P5.jpeg' },
         { id: 105, size: '2kg', color: 'White', price: 400, sku: 'PP-2KG-W', imageUrl: 'https://i.imgur.com/8L5s2aN.jpeg' },
-        { id: 106, size: '2kg', color: 'Black', price: 420, sku: 'PP-2KG-B', imageUrl: 'https://images.unsplash.com/photo-1593881231453-27c14a2913b7?q=80&w=1974&auto=format&fit=crop' },
+        { id: 106, size: '2kg', color: 'Black', price: 420, sku: 'PP-2KG-B', imageUrl: 'https://i.imgur.com/TpHy2P5.jpeg' },
         { id: 107, size: '5kg', color: 'White', price: 600, sku: 'PP-5KG-W', imageUrl: 'https://i.imgur.com/8L5s2aN.jpeg' },
-        { id: 108, size: '5kg', color: 'Black', price: 630, sku: 'PP-5KG-B', imageUrl: 'https://images.unsplash.com/photo-1593881231453-27c14a2913b7?q=80&w=1974&auto=format&fit=crop' },
+        { id: 108, size: '5kg', color: 'Black', price: 630, sku: 'PP-5KG-B', imageUrl: 'https://i.imgur.com/TpHy2P5.jpeg' },
     ]
   },
-  { id: 2, name: 'Printed Non-Woven D-Cut Bag', price: 300, description: 'Eco-friendly non-woven fabric bags with a D-cut handle. Ideal for promotional events and boutiques. Price per 100 pieces. Custom printing available on bulk orders.', imageUrl: 'https://images.unsplash.com/photo-1623485790323-95f70a255956?q=80&w=1935&auto=format&fit=crop' },
-  { id: 3, name: 'Heavy Duty Grocery Bag (W-Cut)', price: 250, description: 'Strong, reusable W-cut (vest style) bags designed to carry heavy grocery items without tearing. Price per 100 pieces. A reliable choice for supermarkets.', imageUrl: 'https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=1974&auto=format&fit=crop' },
-  { id: 4, name: 'Custom Logo Fabric Tote Bag', price: 120, description: 'High-quality cotton fabric tote bags. Perfect for branding with your company logo. Stylish, washable, and reusable. Price per piece.', imageUrl: 'https://images.unsplash.com/photo-1544441893-675973e31985?q=80&w=2070&auto=format&fit=crop' },
-  { id: 5, name: 'Transparent Garment Bags', price: 500, description: 'Clear polythene bags to protect clothing from dust and moisture. Price per roll. Ideal for dry cleaners, laundromats, and boutiques.', imageUrl: 'https://images.unsplash.com/photo-1555529771-835f59fc5efe?q=80&w=1974&auto=format&fit=crop' },
-  { id: 6, name: 'Eco-Friendly Jute Shopping Bag', price: 150, description: 'A stylish and sustainable option. These sturdy jute bags are perfect for eco-conscious brands and customers. Price per piece.', imageUrl: 'https://images.unsplash.com/photo-1621495474723-38c642e05f6a?q=80&w=1964&auto=format&fit=crop' },
-  { id: 7, name: 'Brown Kraft Paper Bag with Handle', price: 450, description: 'Classic and recyclable brown paper bags with strong twisted paper handles. Price per 100 pieces. A great choice for restaurants and retail.', imageUrl: 'https://images.unsplash.com/photo-1526310242159-7b33989fb51e?q=80&w=1974&auto=format&fit=crop' },
-  { id: 8, name: 'Tamper-Proof Courier Bags (100 Pack)', price: 400, description: 'Secure, self-sealing courier bags for e-commerce shipping. Tear-resistant and waterproof to protect contents.', imageUrl: 'https://images.unsplash.com/photo-1594894334346-a60205935b5b?q=80&w=2070&auto=format&fit=crop' },
-  { id: 9, name: 'Small Polythene Pouch Bags (5x7)', price: 100, description: 'Versatile small clear pouches for packing spices, hardware, or other small items. Price per pack of 100.', imageUrl: 'https://images.unsplash.com/photo-1606554862580-0a544c4a4533?q=80&w=2070&auto=format&fit=crop' },
-  { id: 10, name: 'Large Industrial Packaging Bag', price: 60, description: 'Extra-large and durable woven polypropylene sack for bulk storage and transport of grains, sand, or construction materials. Price per piece.', imageUrl: 'https://images.unsplash.com/photo-1618218932159-dd404748115b?q=80&w=2070&auto=format&fit=crop' },
+  { id: 2, name: 'Printed Non-Woven D-Cut Bag', price: 300, description: 'Eco-friendly non-woven fabric bags with a D-cut handle. Ideal for promotional events and boutiques. Price per 100 pieces. Custom printing available on bulk orders.', imageUrl: 'https://i.imgur.com/k2V3L4U.jpeg' },
+  { id: 3, name: 'Heavy Duty Grocery Bag (W-Cut)', price: 250, description: 'Strong, reusable W-cut (vest style) bags designed to carry heavy grocery items without tearing. Price per 100 pieces. A reliable choice for supermarkets.', imageUrl: 'https://i.imgur.com/7ZQ2jL5.jpeg' },
+  { id: 4, name: 'Custom Logo Fabric Tote Bag', price: 120, description: 'High-quality cotton fabric tote bags. Perfect for branding with your company logo. Stylish, washable, and reusable. Price per piece.', imageUrl: 'https://i.imgur.com/q73EaA0.jpeg' },
+  { id: 5, name: 'Transparent Garment Bags', price: 500, description: 'Clear polythene bags to protect clothing from dust and moisture. Price per roll. Ideal for dry cleaners, laundromats, and boutiques.', imageUrl: 'https://i.imgur.com/f0tqY45.jpeg' },
+  { id: 6, name: 'Eco-Friendly Jute Shopping Bag', price: 150, description: 'A stylish and sustainable option. These sturdy jute bags are perfect for eco-conscious brands and customers. Price per piece.', imageUrl: 'https://i.imgur.com/J3q2T6h.jpeg' },
+  { id: 7, name: 'Brown Kraft Paper Bag with Handle', price: 450, description: 'Classic and recyclable brown paper bags with strong twisted paper handles. Price per 100 pieces. A great choice for restaurants and retail.', imageUrl: 'https://i.imgur.com/U8V1i9v.jpeg' },
+  { id: 8, name: 'Tamper-Proof Courier Bags (100 Pack)', price: 400, description: 'Secure, self-sealing courier bags for e-commerce shipping. Tear-resistant and waterproof to protect contents.', imageUrl: 'https://i.imgur.com/tIuYpZI.jpeg' },
+  { id: 9, name: 'Small Polythene Pouch Bags (5x7)', price: 100, description: 'Versatile small clear pouches for packing spices, hardware, or other small items. Price per pack of 100.', imageUrl: 'https://i.imgur.com/g05kY9E.jpeg' },
+  { id: 10, name: 'Large Industrial Packaging Bag', price: 60, description: 'Extra-large and durable woven polypropylene sack for bulk storage and transport of grains, sand, or construction materials. Price per piece.', imageUrl: 'https://i.imgur.com/s6Xm1q8.jpeg' },
 ];
 
 
@@ -195,6 +195,7 @@ export const updateSeoTags = (title: string, description: string, imageUrl?: str
   setMeta('property', 'og:url', window.location.href);
   if (imageUrl) {
     setMeta('property', 'og:image', imageUrl);
+    setMeta('property', 'twitter:image', imageUrl);
   }
 };
 
