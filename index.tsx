@@ -74,6 +74,7 @@ const initialProducts: Product[] = [
   { id: 8, name: 'Tamper-Proof Courier Bags (100 Pack)', price: 400, description: 'Secure, self-sealing courier bags for e-commerce shipping. Tear-resistant and waterproof to protect contents.', imageUrl: 'https://i.imgur.com/tIuYpZI.jpeg', category: 'Specialty Bags' },
   { id: 9, name: 'Small Polythene Pouch Bags (5x7)', price: 100, description: 'Versatile small clear pouches for packing spices, hardware, or other small items. Price per pack of 100.', imageUrl: 'https://i.imgur.com/g05kY9E.jpeg', category: 'PP Bags' },
   { id: 10, name: 'Large Industrial Packaging Bag', price: 60, description: 'Extra-large and durable woven polypropylene sack for bulk storage and transport of grains, sand, or construction materials. Price per piece.', imageUrl: 'https://i.imgur.com/s6Xm1q8.jpeg', category: 'Industrial Bags' },
+  { id: 11, name: 'Transparent "China" Plastic Carry Bag', price: 220, description: 'High transparency, durable fresh plastic bags, often referred to as "China plastic". Price per 100 pieces. Great for showcasing products.', imageUrl: 'https://i.imgur.com/MhDIQ3h.jpeg', category: 'PP Bags' },
 ];
 
 

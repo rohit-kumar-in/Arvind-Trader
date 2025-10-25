@@ -159,7 +159,13 @@ export const AdminPage = ({ products, setProducts, setHeroImageUrl }: {
     if (productToSave.id) {
         setProducts(prev => prev.map(p => p.id === productToSave.id ? productToSave : p));
     } else {
-        const newProduct = { ...productToSave, id: Date.now() };
+        const placeholderImage = 'https://i.imgur.com/dynTM3k.png'; // Generic placeholder
+        const newProduct = { 
+            ...productToSave, 
+            id: Date.now(),
+            // Ensure new products without an uploaded image get a placeholder
+            imageUrl: productToSave.imageUrl || placeholderImage 
+        };
         setProducts(prev => [...prev, newProduct]);
     }
     setEditingProduct(null);
