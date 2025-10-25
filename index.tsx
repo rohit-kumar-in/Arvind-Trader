@@ -282,7 +282,7 @@ const ProductCard = ({ product }: { product: Product }) => {
 
 // --- PAGES ---
 
-const HomePage = ({ products }: { products: Product[] }) => {
+const HomePage = ({ products, heroImageUrl }: { products: Product[], heroImageUrl: string }) => {
     useEffect(() => {
         updateSeoTags('Arvind Trader | Wholesale Carry Bags in Bhagalpur', 'Your one-stop shop for high-quality PP bags, non-woven bags, and custom printed carry bags. Serving Jagdishpur, Bhagalpur and nearby areas.');
     }, []);
@@ -301,10 +301,14 @@ const HomePage = ({ products }: { products: Product[] }) => {
       "description": "Wholesale and retail supplier of carry bags in Jagdishpur, Bhagalpur, Bihar."
     };
 
+    const heroStyle = {
+      backgroundImage: `linear-gradient(rgba(10, 37, 64, 0.6), rgba(10, 37, 64, 0.6)), url('${heroImageUrl}')`
+    };
+
     return (
         <div className="container">
             <JsonLd data={organizationSchema} />
-            <div className="hero">
+            <div className="hero" style={heroStyle}>
                 <h1>Wholesale Carry Bags for Your Business</h1>
                 <p>High-quality PP, Non-Woven, and Custom Bags at Bhagalpur Market Rates.</p>
                 <Link href="/products" className="btn">Shop Now</Link>
@@ -615,6 +619,7 @@ const ConfirmationPage = () => {
 // --- APP ---
 const App = () => {
     const path = usePath();
+    const defaultHeroImage = 'https://i.imgur.com/5z02k5c.jpeg';
 
     const [products, setProducts] = useState<Product[]>(() => {
         try {
@@ -625,6 +630,11 @@ const App = () => {
             return initialProducts;
         }
     });
+    
+    const [heroImageUrl, setHeroImageUrl] = useState<string>(() => {
+        return localStorage.getItem('arvind-trader-hero-image') || defaultHeroImage;
+    });
+
 
     useEffect(() => {
         localStorage.setItem('arvind-trader-products', JSON.stringify(products));
@@ -642,7 +652,7 @@ const App = () => {
     const parts = path.split('/').filter(Boolean);
 
     const renderPage = () => {
-        if (parts.length === 0) return <HomePage products={products} />;
+        if (parts.length === 0) return <HomePage products={products} heroImageUrl={heroImageUrl} />;
         if (parts[0] === 'products') return <ProductListPage products={products} />;
         if (parts[0] === 'product' && parts[1]) {
             const id = parseInt(parts[1], 10);
@@ -652,9 +662,9 @@ const App = () => {
         if (parts[0] === 'about') return <AboutPage />;
         if (parts[0] === 'checkout') return <CheckoutPage />;
         if (parts[0] === 'confirmation') return <ConfirmationPage />;
-        if (parts[0] === 'admin') return <AdminPage products={products} setProducts={setProducts} />;
+        if (parts[0] === 'admin') return <AdminPage products={products} setProducts={setProducts} setHeroImageUrl={setHeroImageUrl} />;
         
-        return <HomePage products={products} />; // Fallback to home page
+        return <HomePage products={products} heroImageUrl={heroImageUrl} />; // Fallback to home page
     };
 
     return (

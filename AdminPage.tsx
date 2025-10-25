@@ -65,9 +65,15 @@ const ProductForm = ({
 };
 
 // --- MAIN COMPONENT: ADMIN PAGE ---
-export const AdminPage = ({ products, setProducts }: { products: Product[]; setProducts: React.Dispatch<React.SetStateAction<Product[]>> }) => {
+export const AdminPage = ({ products, setProducts, setHeroImageUrl }: { 
+    products: Product[]; 
+    setProducts: React.Dispatch<React.SetStateAction<Product[]>>;
+    setHeroImageUrl: React.Dispatch<React.SetStateAction<string>>;
+}) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Partial<Product> | null>(null);
+  const defaultHeroImage = 'https://i.imgur.com/5z02k5c.jpeg';
+
 
   useEffect(() => {
     const password = prompt('Enter admin password:');
@@ -101,6 +107,25 @@ export const AdminPage = ({ products, setProducts }: { products: Product[]; setP
     }
     setEditingProduct(null); // Close form
   };
+  
+  const handleBannerUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (file) {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+              const newImageUrl = reader.result as string;
+              setHeroImageUrl(newImageUrl);
+              localStorage.setItem('arvind-trader-hero-image', newImageUrl);
+          };
+          reader.readAsDataURL(file);
+      }
+  };
+
+  const handleResetBanner = () => {
+      setHeroImageUrl(defaultHeroImage);
+      localStorage.removeItem('arvind-trader-hero-image');
+  };
+
 
   if (!isAuthenticated) {
     return <div className="container"><h2>Admin Access Only</h2><p>Please refresh and enter the correct password.</p></div>;
@@ -116,19 +141,30 @@ export const AdminPage = ({ products, setProducts }: { products: Product[]; setP
 
   return (
     <div className="container admin-container">
-      <h1>Manage Products</h1>
-      <button className="btn" onClick={handleAddNew} style={{marginBottom: '1rem'}}>Add New Product</button>
-      <div className="admin-product-list">
-        {products.map(product => (
-          <div key={product.id} className="admin-product-item">
-            <img src={product.imageUrl} alt={product.name} />
-            <span>{product.name}</span>
-            <div className="admin-product-actions">
-                <button className="btn btn-secondary" onClick={() => handleEdit(product)}>Edit</button>
-                <button className="btn btn-danger" onClick={() => handleDelete(product.id)}>Delete</button>
-            </div>
+      <h1>Admin Panel</h1>
+      <div className="admin-section">
+          <h2>Manage Products</h2>
+          <button className="btn" onClick={handleAddNew} style={{marginBottom: '1rem'}}>Add New Product</button>
+          <div className="admin-product-list">
+            {products.map(product => (
+              <div key={product.id} className="admin-product-item">
+                <img src={product.imageUrl} alt={product.name} />
+                <span>{product.name}</span>
+                <div className="admin-product-actions">
+                    <button className="btn btn-secondary" onClick={() => handleEdit(product)}>Edit</button>
+                    <button className="btn btn-danger" onClick={() => handleDelete(product.id)}>Delete</button>
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
+      </div>
+      <div className="admin-section">
+        <h2>Homepage Banner</h2>
+        <div className="form-group">
+            <label htmlFor="banner-upload">Upload New Banner</label>
+            <input type="file" id="banner-upload" name="banner" accept="image/*" onChange={handleBannerUpload} />
+        </div>
+        <button className="btn btn-secondary" onClick={handleResetBanner}>Reset to Default</button>
       </div>
     </div>
   );
