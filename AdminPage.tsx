@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Product } from './index.tsx';
+import { Product, getImageUrl } from './index.tsx';
 
 const PRODUCTS_PER_PAGE = 5;
 
@@ -34,7 +34,7 @@ const ProductForm = ({
       if (file) {
           const reader = new FileReader();
           reader.onloadend = () => {
-              setFormData(prev => ({ ...prev, imageUrl: reader.result as string }));
+              setFormData(prev => ({ ...prev, imagePath: reader.result as string }));
           };
           reader.readAsDataURL(file);
       }
@@ -70,9 +70,9 @@ const ProductForm = ({
           <input type="number" id="price" name="price" value={formData.price || ''} onChange={handleChange} step="0.01" />
         </div>
         <div className="form-group">
-          <label htmlFor="imageUrl">Image</label>
-          <input type="file" id="imageUrl" name="image" accept="image/*" onChange={handleImageUpload} />
-          {formData.imageUrl && <img src={formData.imageUrl} alt="Preview" className="image-preview" />}
+          <label htmlFor="imagePath">Image</label>
+          <input type="file" id="imagePath" name="image" accept="image/*" onChange={handleImageUpload} />
+          {formData.imagePath && <img src={getImageUrl(formData.imagePath)} alt="Preview" className="image-preview" />}
         </div>
         <div className="form-actions">
           <button type="submit" className="btn">Save Product</button>
@@ -84,10 +84,10 @@ const ProductForm = ({
 };
 
 // --- MAIN COMPONENT: ADMIN PAGE ---
-export const AdminPage = ({ products, setProducts, setHeroImageUrl }: { 
+export const AdminPage = ({ products, setProducts, setHeroImagePath }: { 
     products: Product[]; 
     setProducts: React.Dispatch<React.SetStateAction<Product[]>>;
-    setHeroImageUrl: React.Dispatch<React.SetStateAction<string>>;
+    setHeroImagePath: React.Dispatch<React.SetStateAction<string>>;
 }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Partial<Product> | null>(null);
@@ -96,7 +96,7 @@ export const AdminPage = ({ products, setProducts, setHeroImageUrl }: {
   const [sortOrder, setSortOrder] = useState('default');
   const [currentPage, setCurrentPage] = useState(1);
   
-  const defaultHeroImage = 'https://i.imgur.com/5z02k5c.jpeg';
+  const defaultHeroImagePath = '5z02k5c.jpeg';
   const categories = useMemo(() => ['all', ...Array.from(new Set(products.map(p => p.category)))], [products]);
 
 
@@ -159,14 +159,12 @@ export const AdminPage = ({ products, setProducts, setHeroImageUrl }: {
     // Create a mutable copy to ensure we can modify it.
     const updatedProduct = { ...productToSave };
 
-    // If the product has variants, we need to ensure their images are
-    // synchronized with the main product image that was just uploaded.
-    // The product detail page prioritizes variant images, so if they
-    // aren't updated, the new main image won't show.
-    if (updatedProduct.variants && updatedProduct.variants.length > 0) {
+    // If the product has variants, and the main image is not a base64 string,
+    // we assume it's a path and sync it to the variants.
+    if (updatedProduct.variants && updatedProduct.variants.length > 0 && !updatedProduct.imagePath.startsWith('data:')) {
       updatedProduct.variants = updatedProduct.variants.map(variant => ({
         ...variant,
-        imageUrl: updatedProduct.imageUrl, // Set variant image to the main product image
+        imagePath: updatedProduct.imagePath, // Set variant image to the main product image
       }));
     }
 
@@ -175,12 +173,11 @@ export const AdminPage = ({ products, setProducts, setHeroImageUrl }: {
         setProducts(prev => prev.map(p => (p.id === updatedProduct.id ? updatedProduct : p)));
     } else {
         // This is a new product.
-        const placeholderImage = 'https://i.imgur.com/dynTM3k.png'; // Generic placeholder
         const newProduct = { 
             ...updatedProduct, 
             id: Date.now(),
-            // Ensure new products without an uploaded image get a placeholder.
-            imageUrl: updatedProduct.imageUrl || placeholderImage 
+            // Ensure new products without an uploaded image get a placeholder path.
+            imagePath: updatedProduct.imagePath || '' 
         };
         setProducts(prev => [...prev, newProduct]);
     }
@@ -192,17 +189,17 @@ export const AdminPage = ({ products, setProducts, setHeroImageUrl }: {
       if (file) {
           const reader = new FileReader();
           reader.onloadend = () => {
-              const newImageUrl = reader.result as string;
-              setHeroImageUrl(newImageUrl);
-              localStorage.setItem('arvind-trader-hero-image', newImageUrl);
+              const newImageBase64 = reader.result as string;
+              setHeroImagePath(newImageBase64);
+              localStorage.setItem('arvind-trader-hero-image-path', newImageBase64);
           };
           reader.readAsDataURL(file);
       }
   };
 
   const handleResetBanner = () => {
-      setHeroImageUrl(defaultHeroImage);
-      localStorage.removeItem('arvind-trader-hero-image');
+      setHeroImagePath(defaultHeroImagePath);
+      localStorage.removeItem('arvind-trader-hero-image-path');
   };
 
 
@@ -250,7 +247,7 @@ export const AdminPage = ({ products, setProducts, setHeroImageUrl }: {
           <div className="admin-product-list">
             {currentProducts.map(product => (
               <div key={product.id} className="admin-product-item">
-                <img src={product.imageUrl} alt={product.name} />
+                <img src={getImageUrl(product.imagePath, 'w-60,h-60,c-fill')} alt={product.name} />
                 <div className="admin-product-details">
                     <span className="admin-product-name">{product.name}</span>
                     <span className="admin-product-category">{product.category}</span>

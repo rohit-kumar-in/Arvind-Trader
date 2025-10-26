@@ -7,6 +7,23 @@ import { createRoot } from 'react-dom/client';
 import { AboutPage } from './AboutPage.tsx';
 import { AdminPage } from './AdminPage.tsx';
 
+// --- IMAGEKIT SETUP ---
+// TODO: Replace with your actual ImageKit URL endpoint.
+const IMAGEKIT_URL_ENDPOINT = 'https://ik.imagekit.io/your-kit-id'; 
+const LOGO_PATH = '7w5zJ8W.png';
+const HERO_IMAGE_PATH = '5z02k5c.jpeg';
+
+export const getImageUrl = (path?: string, transformations?: string): string => {
+    if (!path) return `${IMAGEKIT_URL_ENDPOINT}/dynTM3k.png?tr=w-200`; // A default placeholder
+    // If it's already a full URL (like a data URI or an external link), return it as is.
+    if (path.startsWith('data:') || path.startsWith('http')) {
+        return path;
+    }
+    const url = `${IMAGEKIT_URL_ENDPOINT}/${path}`;
+    return transformations ? `${url}?tr=${transformations}` : url;
+};
+
+
 // --- DATA & TYPES ---
 
 export interface Variant {
@@ -15,14 +32,14 @@ export interface Variant {
   color: string;
   price: number;
   sku: string;
-  imageUrl?: string;
+  imagePath?: string;
 }
 
 export interface Product {
   id: number;
   name: string;
   description: string;
-  imageUrl: string;
+  imagePath: string;
   category: string;
   variants?: Variant[];
   price?: number; // For simple products without variants
@@ -52,29 +69,29 @@ const initialProducts: Product[] = [
     id: 1, 
     name: 'Standard PP Carry Bag', 
     description: 'Durable and lightweight PP (polypropylene) bags, perfect for retail stores and groceries. Available in multiple sizes and colors.', 
-    imageUrl: 'https://i.imgur.com/8L5s2aN.jpeg',
+    imagePath: '8L5s2aN.jpeg',
     category: 'PP Bags',
     variants: [
-        { id: 101, size: '500g', color: 'White', price: 150, sku: 'PP-500-W', imageUrl: 'https://i.imgur.com/8L5s2aN.jpeg' },
-        { id: 102, size: '500g', color: 'Black', price: 160, sku: 'PP-500-B', imageUrl: 'https://i.imgur.com/TpHy2P5.jpeg' },
-        { id: 103, size: '1kg', color: 'White', price: 250, sku: 'PP-1KG-W', imageUrl: 'https://i.imgur.com/8L5s2aN.jpeg' },
-        { id: 104, size: '1kg', color: 'Black', price: 265, sku: 'PP-1KG-B', imageUrl: 'https://i.imgur.com/TpHy2P5.jpeg' },
-        { id: 105, size: '2kg', color: 'White', price: 400, sku: 'PP-2KG-W', imageUrl: 'https://i.imgur.com/8L5s2aN.jpeg' },
-        { id: 106, size: '2kg', color: 'Black', price: 420, sku: 'PP-2KG-B', imageUrl: 'https://i.imgur.com/TpHy2P5.jpeg' },
-        { id: 107, size: '5kg', color: 'White', price: 600, sku: 'PP-5KG-W', imageUrl: 'https://i.imgur.com/8L5s2aN.jpeg' },
-        { id: 108, size: '5kg', color: 'Black', price: 630, sku: 'PP-5KG-B', imageUrl: 'https://i.imgur.com/TpHy2P5.jpeg' },
+        { id: 101, size: '500g', color: 'White', price: 150, sku: 'PP-500-W', imagePath: '8L5s2aN.jpeg' },
+        { id: 102, size: '500g', color: 'Black', price: 160, sku: 'PP-500-B', imagePath: 'TpHy2P5.jpeg' },
+        { id: 103, size: '1kg', color: 'White', price: 250, sku: 'PP-1KG-W', imagePath: '8L5s2aN.jpeg' },
+        { id: 104, size: '1kg', color: 'Black', price: 265, sku: 'PP-1KG-B', imagePath: 'TpHy2P5.jpeg' },
+        { id: 105, size: '2kg', color: 'White', price: 400, sku: 'PP-2KG-W', imagePath: '8L5s2aN.jpeg' },
+        { id: 106, size: '2kg', color: 'Black', price: 420, sku: 'PP-2KG-B', imagePath: 'TpHy2P5.jpeg' },
+        { id: 107, size: '5kg', color: 'White', price: 600, sku: 'PP-5KG-W', imagePath: '8L5s2aN.jpeg' },
+        { id: 108, size: '5kg', color: 'Black', price: 630, sku: 'PP-5KG-B', imagePath: 'TpHy2P5.jpeg' },
     ]
   },
-  { id: 2, name: 'Printed Non-Woven D-Cut Bag', price: 300, description: 'Eco-friendly non-woven fabric bags with a D-cut handle. Ideal for promotional events and boutiques. Price per 100 pieces. Custom printing available on bulk orders.', imageUrl: 'https://i.imgur.com/k2V3L4U.jpeg', category: 'Non-Woven Bags' },
-  { id: 3, name: 'Heavy Duty Grocery Bag (W-Cut)', price: 250, description: 'Strong, reusable W-cut (vest style) bags designed to carry heavy grocery items without tearing. Price per 100 pieces. A reliable choice for supermarkets.', imageUrl: 'https://i.imgur.com/7ZQ2jL5.jpeg', category: 'Grocery Bags' },
-  { id: 4, name: 'Custom Logo Fabric Tote Bag', price: 120, description: 'High-quality cotton fabric tote bags. Perfect for branding with your company logo. Stylish, washable, and reusable. Price per piece.', imageUrl: 'https://i.imgur.com/v13MCMF.jpeg', category: 'Fabric & Tote Bags' },
-  { id: 5, name: 'Transparent Garment Bags', price: 500, description: 'Clear polythene bags to protect clothing from dust and moisture. Price per roll. Ideal for dry cleaners, laundromats, and boutiques.', imageUrl: 'https://i.imgur.com/f0tqY45.jpeg', category: 'Specialty Bags' },
-  { id: 6, name: 'Eco-Friendly Jute Shopping Bag', price: 150, description: 'A stylish and sustainable option. These sturdy jute bags are perfect for eco-conscious brands and customers. Price per piece.', imageUrl: 'https://i.imgur.com/J3q2T6h.jpeg', category: 'Fabric & Tote Bags' },
-  { id: 7, name: 'Brown Kraft Paper Bag with Handle', price: 450, description: 'Classic and recyclable brown paper bags with strong twisted paper handles. Price per 100 pieces. A great choice for restaurants and retail.', imageUrl: 'https://i.imgur.com/U8V1i9v.jpeg', category: 'Paper Bags' },
-  { id: 8, name: 'Tamper-Proof Courier Bags (100 Pack)', price: 400, description: 'Secure, self-sealing courier bags for e-commerce shipping. Tear-resistant and waterproof to protect contents.', imageUrl: 'https://i.imgur.com/tIuYpZI.jpeg', category: 'Specialty Bags' },
-  { id: 9, name: 'Small Polythene Pouch Bags (5x7)', price: 100, description: 'Versatile small clear pouches for packing spices, hardware, or other small items. Price per pack of 100.', imageUrl: 'https://i.imgur.com/g05kY9E.jpeg', category: 'PP Bags' },
-  { id: 10, name: 'Large Industrial Packaging Bag', price: 60, description: 'Extra-large and durable woven polypropylene sack for bulk storage and transport of grains, sand, or construction materials. Price per piece.', imageUrl: 'https://i.imgur.com/s6Xm1q8.jpeg', category: 'Industrial Bags' },
-  { id: 11, name: 'Transparent "China" Plastic Carry Bag', price: 220, description: 'High transparency, durable fresh plastic bags, often referred to as "China plastic". Price per 100 pieces. Great for showcasing products.', imageUrl: 'https://i.imgur.com/MhDIQ3h.jpeg', category: 'PP Bags' },
+  { id: 2, name: 'Printed Non-Woven D-Cut Bag', price: 300, description: 'Eco-friendly non-woven fabric bags with a D-cut handle. Ideal for promotional events and boutiques. Price per 100 pieces. Custom printing available on bulk orders.', imagePath: 'k2V3L4U.jpeg', category: 'Non-Woven Bags' },
+  { id: 3, name: 'Heavy Duty Grocery Bag (W-Cut)', price: 250, description: 'Strong, reusable W-cut (vest style) bags designed to carry heavy grocery items without tearing. Price per 100 pieces. A reliable choice for supermarkets.', imagePath: '7ZQ2jL5.jpeg', category: 'Grocery Bags' },
+  { id: 4, name: 'Custom Logo Fabric Tote Bag', price: 120, description: 'High-quality cotton fabric tote bags. Perfect for branding with your company logo. Stylish, washable, and reusable. Price per piece.', imagePath: 'v13MCMF.jpeg', category: 'Fabric & Tote Bags' },
+  { id: 5, name: 'Transparent Garment Bags', price: 500, description: 'Clear polythene bags to protect clothing from dust and moisture. Price per roll. Ideal for dry cleaners, laundromats, and boutiques.', imagePath: 'f0tqY45.jpeg', category: 'Specialty Bags' },
+  { id: 6, name: 'Eco-Friendly Jute Shopping Bag', price: 150, description: 'A stylish and sustainable option. These sturdy jute bags are perfect for eco-conscious brands and customers. Price per piece.', imagePath: 'J3q2T6h.jpeg', category: 'Fabric & Tote Bags' },
+  { id: 7, name: 'Brown Kraft Paper Bag with Handle', price: 450, description: 'Classic and recyclable brown paper bags with strong twisted paper handles. Price per 100 pieces. A great choice for restaurants and retail.', imagePath: 'U8V1i9v.jpeg', category: 'Paper Bags' },
+  { id: 8, name: 'Tamper-Proof Courier Bags (100 Pack)', price: 400, description: 'Secure, self-sealing courier bags for e-commerce shipping. Tear-resistant and waterproof to protect contents.', imagePath: 'tIuYpZI.jpeg', category: 'Specialty Bags' },
+  { id: 9, name: 'Small Polythene Pouch Bags (5x7)', price: 100, description: 'Versatile small clear pouches for packing spices, hardware, or other small items. Price per pack of 100.', imagePath: 'g05kY9E.jpeg', category: 'PP Bags' },
+  { id: 10, name: 'Large Industrial Packaging Bag', price: 60, description: 'Extra-large and durable woven polypropylene sack for bulk storage and transport of grains, sand, or construction materials. Price per piece.', imagePath: 's6Xm1q8.jpeg', category: 'Industrial Bags' },
+  { id: 11, name: 'Transparent "China" Plastic Carry Bag', price: 220, description: 'High transparency, durable fresh plastic bags, often referred to as "China plastic". Price per 100 pieces. Great for showcasing products.', imagePath: 'MhDIQ3h.jpeg', category: 'PP Bags' },
 ];
 
 
@@ -179,7 +196,7 @@ const updateCanonicalUrl = (url: string) => {
     canonicalLink.setAttribute('href', url);
 };
 
-export const updateSeoTags = (title: string, description: string, imageUrl?: string) => {
+export const updateSeoTags = (title: string, description: string, imagePath?: string) => {
   document.title = title;
   updateCanonicalUrl(window.location.href);
 
@@ -198,7 +215,7 @@ export const updateSeoTags = (title: string, description: string, imageUrl?: str
   setMeta('property', 'og:description', description);
   setMeta('property', 'og:url', window.location.href);
 
-  // Only set meta image tags if it's a real URL, not a long data URI
+  const imageUrl = getImageUrl(imagePath, 'w-1200,h-630,c-pad_resize,bg-FFFFFF');
   if (imageUrl && !imageUrl.startsWith('data:')) {
     setMeta('property', 'og:image', imageUrl);
     setMeta('property', 'twitter:image', imageUrl);
@@ -237,7 +254,9 @@ const Header = () => {
     return (
         <header className="app-header">
             <div className="header-content">
-                <Link href="/" className="logo">Arvind Trader</Link>
+                <Link href="/" className="logo">
+                    <img src={getImageUrl(LOGO_PATH)} alt="Arvind Trader Logo" />
+                </Link>
                 <nav className="nav-links">
                     <Link href="/">Home</Link>
                     <Link href="/products">Products</Link>
@@ -270,7 +289,7 @@ const ProductCard = ({ product }: { product: Product }) => {
     return (
         <div className="product-card">
             <Link href={`/product/${product.id}`}>
-                <img src={product.imageUrl} alt={product.name} className="product-image" />
+                <img src={getImageUrl(product.imagePath, 'w-400,h-300,c-at_max')} alt={product.name} className="product-image" />
                 <div className="product-info">
                     <h3 className="product-name">{product.name}</h3>
                 </div>
@@ -287,9 +306,9 @@ const ProductCard = ({ product }: { product: Product }) => {
 
 // --- PAGES ---
 
-const HomePage = ({ products, heroImageUrl }: { products: Product[], heroImageUrl: string }) => {
+const HomePage = ({ products, heroImagePath }: { products: Product[], heroImagePath: string }) => {
     useEffect(() => {
-        updateSeoTags('Arvind Trader | Wholesale Carry Bags in Bhagalpur', 'Your one-stop shop for high-quality PP bags, non-woven bags, and custom printed carry bags. Serving Jagdishpur, Bhagalpur and nearby areas.');
+        updateSeoTags('Arvind Trader | Wholesale Carry Bags in Bhagalpur', 'Your one-stop shop for high-quality PP bags, non-woven bags, and custom printed carry bags. Serving Jagdishpur, Bhagalpur and nearby areas.', LOGO_PATH);
     }, []);
     
     const organizationSchema = {
@@ -297,7 +316,7 @@ const HomePage = ({ products, heroImageUrl }: { products: Product[], heroImageUr
       "@type": "Organization",
       "name": "Arvind Trader",
       "url": "https://arvind-trader.vercel.app/",
-      "logo": "https://arvind-trader.vercel.app/logo.png", // Assume you have a logo
+      "logo": getImageUrl(LOGO_PATH),
       "contactPoint": {
         "@type": "ContactPoint",
         "telephone": "7644000929",
@@ -307,7 +326,7 @@ const HomePage = ({ products, heroImageUrl }: { products: Product[], heroImageUr
     };
 
     const heroStyle = {
-      backgroundImage: `linear-gradient(rgba(10, 37, 64, 0.6), rgba(10, 37, 64, 0.6)), url('${heroImageUrl}')`
+      backgroundImage: `linear-gradient(rgba(10, 37, 64, 0.6), rgba(10, 37, 64, 0.6)), url('${getImageUrl(heroImagePath, 'q-auto,f-auto')}')`
     };
 
     return (
@@ -350,7 +369,7 @@ const ProductDetailPage = ({ id, products }: { id: number, products: Product[] }
     const [selectedColor, setSelectedColor] = useState<string | null>(product?.variants ? product.variants[0].color : null);
     const [selectedSize, setSelectedSize] = useState<string | null>(product?.variants ? product.variants[0].size : null);
     const [selectedVariant, setSelectedVariant] = useState<Variant | null>(product?.variants ? product.variants[0] : null);
-    const [currentImage, setCurrentImage] = useState<string | undefined>(product?.imageUrl);
+    const [currentImagePath, setCurrentImagePath] = useState<string | undefined>(product?.imagePath);
     
     useEffect(() => {
         if (product?.variants && selectedColor && selectedSize) {
@@ -360,20 +379,20 @@ const ProductDetailPage = ({ id, products }: { id: number, products: Product[] }
     }, [product, selectedColor, selectedSize]);
 
     useEffect(() => {
-      if (selectedVariant?.imageUrl) {
-        setCurrentImage(selectedVariant.imageUrl);
-      } else if (product?.imageUrl) {
-        setCurrentImage(product.imageUrl);
+      if (selectedVariant?.imagePath) {
+        setCurrentImagePath(selectedVariant.imagePath);
+      } else if (product?.imagePath) {
+        setCurrentImagePath(product.imagePath);
       }
     }, [selectedVariant, product]);
 
     useEffect(() => {
         if (product) {
-            updateSeoTags(`${product.name} | Arvind Trader`, product.description, currentImage);
+            updateSeoTags(`${product.name} | Arvind Trader`, product.description, currentImagePath);
         } else {
             updateSeoTags('Product Not Found | Arvind Trader', 'The product you are looking for does not exist.');
         }
-    }, [product, currentImage]);
+    }, [product, currentImagePath]);
 
     if (!product) {
         return <div className="container"><h2>Product not found!</h2></div>;
@@ -407,7 +426,7 @@ const ProductDetailPage = ({ id, products }: { id: number, products: Product[] }
         .slice(0, 3);
         
     const getProductSchema = () => {
-        const imagesForSchema = product.imageUrl && !product.imageUrl.startsWith('data:') ? [product.imageUrl] : [];
+        const imagesForSchema = product.imagePath && !product.imagePath.startsWith('data:') ? [getImageUrl(product.imagePath)] : [];
 
         const baseSchema = {
             "@context": "https://schema.org/",
@@ -460,7 +479,7 @@ const ProductDetailPage = ({ id, products }: { id: number, products: Product[] }
             <JsonLd data={getProductSchema()} />
             <div className="product-detail-container">
                 <div className="product-detail-image">
-                    <img src={currentImage} alt={`${product.name} - ${selectedColor}`} />
+                    <img src={getImageUrl(currentImagePath, 'w-600,h-600,c-at_max')} alt={`${product.name} - ${selectedColor}`} />
                 </div>
                 <div className="product-detail-info">
                     <h1>{product.name}</h1>
@@ -544,9 +563,10 @@ const CartPage = () => {
             <h1>Your Shopping Cart</h1>
             {cartItems.map(item => {
                 const cartItemId = `${item.product.id}-${item.variant.id}`;
+                const imagePath = item.variant.imagePath || item.product.imagePath;
                 return (
                     <div key={cartItemId} className="cart-item">
-                        <img src={item.variant.imageUrl || item.product.imageUrl} alt={item.product.name} className="cart-item-img" />
+                        <img src={getImageUrl(imagePath, 'w-100,h-100,c-at_max')} alt={item.product.name} className="cart-item-img" />
                         <div className="cart-item-info">
                             <h3 className="cart-item-name">{item.product.name}</h3>
                             <p className="cart-item-variant">{item.variant.size} / {item.variant.color}</p>
@@ -626,7 +646,7 @@ const ConfirmationPage = () => {
 // --- APP ---
 const App = () => {
     const path = usePath();
-    const defaultHeroImage = 'https://i.imgur.com/5z02k5c.jpeg';
+    const defaultHeroImagePath = HERO_IMAGE_PATH;
 
     const [products, setProducts] = useState<Product[]>(() => {
         try {
@@ -638,8 +658,8 @@ const App = () => {
         }
     });
     
-    const [heroImageUrl, setHeroImageUrl] = useState<string>(() => {
-        return localStorage.getItem('arvind-trader-hero-image') || defaultHeroImage;
+    const [heroImagePath, setHeroImagePath] = useState<string>(() => {
+        return localStorage.getItem('arvind-trader-hero-image-path') || defaultHeroImagePath;
     });
 
 
@@ -659,7 +679,7 @@ const App = () => {
     const parts = path.split('/').filter(Boolean);
 
     const renderPage = () => {
-        if (parts.length === 0) return <HomePage products={products} heroImageUrl={heroImageUrl} />;
+        if (parts.length === 0) return <HomePage products={products} heroImagePath={heroImagePath} />;
         if (parts[0] === 'products') return <ProductListPage products={products} />;
         if (parts[0] === 'product' && parts[1]) {
             const id = parseInt(parts[1], 10);
@@ -669,9 +689,9 @@ const App = () => {
         if (parts[0] === 'about') return <AboutPage />;
         if (parts[0] === 'checkout') return <CheckoutPage />;
         if (parts[0] === 'confirmation') return <ConfirmationPage />;
-        if (parts[0] === 'admin') return <AdminPage products={products} setProducts={setProducts} setHeroImageUrl={setHeroImageUrl} />;
+        if (parts[0] === 'admin') return <AdminPage products={products} setProducts={setProducts} setHeroImagePath={setHeroImagePath} />;
         
-        return <HomePage products={products} heroImageUrl={heroImageUrl} />; // Fallback to home page
+        return <HomePage products={products} heroImagePath={heroImagePath} />; // Fallback to home page
     };
 
     return (

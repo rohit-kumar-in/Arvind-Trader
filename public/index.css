@@ -78,9 +78,12 @@ img {
 }
 
 .logo {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--text-light);
+  line-height: 0;
+}
+
+.logo img {
+  max-height: 45px;
+  width: auto;
 }
 
 .nav-links a {
